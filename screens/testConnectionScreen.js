@@ -42,7 +42,7 @@ module.exports = async (screen) => {
             });
             if (req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
             else {
-                appendList(screen, list, `RESPONSE: not OK - FAILED!`);
+                appendList(screen, list, `RESPONSE: not OK (status: ${req.statusText}) - FAILED!`);
                 return tests.passed--;
             }
         }
