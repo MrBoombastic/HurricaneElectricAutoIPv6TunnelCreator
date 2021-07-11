@@ -36,13 +36,13 @@ module.exports = async (screen) => {
             return tests.passed--;
         } else {
             appendList(screen, list, `TEST: sending request from IP ${ip}`);
-            const req = await got("https://api64.ipify.org/?format=json", {
+            const req = await got.get("https://api64.ipify.org/?format=json", {
                 localAddress: ip,
                 dnsLookupIpVersion: "ipv6"
-            });
-            if (req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
+            }).catch(e => e);
+            if (req?.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
             else {
-                appendList(screen, list, `RESPONSE: not OK (status: ${req.statusText}) - FAILED!`);
+                appendList(screen, list, `RESPONSE: not OK (status: ${req?.statusText || req}) - FAILED!`);
                 return tests.passed--;
             }
         }
