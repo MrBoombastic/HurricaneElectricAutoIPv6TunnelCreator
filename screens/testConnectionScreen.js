@@ -1,22 +1,23 @@
 const styles = require("../styles"),
     {appendList} = require("../tools"),
     fs = require("fs"),
-    {spawn} = require('child_process'),
+    {exec} = require('child_process'),
     got = require("got"),
     blessed = require('blessed');
 
 const getIP = () => {
-    const child = spawn('ip', ['-6', 'route', '|', 'grep', '-m1', 'he-ipv6 proto'], {shell: true});
-
-    child.stdout.on('data', (data) => {
-        return data
+    return new Promise((resolve, reject) => {
+        exec('ip -6 route | grep -m1 "he-ipv6 proto"', (err, stdout) => {
+            if (err) reject(false);
+            resolve(stdout);
+        });
     });
-}
+};
 
 
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        ip = getIP(),
+        ip = JSON.stringify(await getIP()),
         tests = {count: 3, passed: 3};
     let ping6 = true;
     list.focus();
