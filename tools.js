@@ -6,6 +6,6 @@ module.exports = {
         screen.render();
     },
     getIP: () => {
-        return os.networkInterfaces()
+        return (os.networkInterfaces())["he-ipv6"][0].address
     }
 };

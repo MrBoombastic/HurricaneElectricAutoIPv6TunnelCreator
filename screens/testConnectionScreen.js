@@ -14,7 +14,7 @@ module.exports = async (screen) => {
     list.addItem("INFO: testing started...");
     screen.append(list);
 
-    appendList(screen, list, `INFO: testing from IP ${JSON.stringify(ip["he-ipv6"])}`)
+    appendList(screen, list, `INFO: testing from IP ${ip}`)
     //stage 1
     try {
         await got.get("https://api64.ipify.org/?format=json", {
