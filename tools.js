@@ -7,13 +7,8 @@ module.exports = {
     },
     getIP: async () => {
         exec('ip -6 addr show dev he-ipv6', function (error, stdout, stderr) {
-            if (error) {
-                console.log(error.stack);
-                console.log('Error code: ' + error.code);
-                console.log('Signal received: ' + error.signal);
-            }
-            console.log('Child Process STDOUT: ' + stdout);
-            console.log('Child Process STDERR: ' + stderr);
+            if (error || stderr) return false;
+            if(stdout.includes("scope global")) console.log("FOUND SOMETHING!!!!!!`")
             return stdout;
         });
     }
