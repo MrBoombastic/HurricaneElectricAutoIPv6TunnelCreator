@@ -14,7 +14,7 @@ module.exports = {
         }
     },
     getIP: async () => {
-        exec('ip -6 addr show dev he-ipv6', function (error, stdout, stderr) {
+        exec('ip -6 addr show dev he-ipv6', (error, stdout, stderr) => {
             if (error || stderr) return false;
             return this.specificLineSearch(stdout, "scope global") || false;
         });
