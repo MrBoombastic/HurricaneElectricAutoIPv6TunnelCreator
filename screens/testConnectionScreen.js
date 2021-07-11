@@ -58,7 +58,7 @@ module.exports = async (screen) => {
             matchingTest = false;
             tests.passed--;
         }
-        appendList(screen, list, `TEST: checking if given IP and received IP are matching\n(${IP} vs ${retrievedIP} - ${matchingTest ? "PASSED" : "FAILED"}`);
+        appendList(screen, list, `TEST: checking if given IP and received IP are matching (${IP} vs ${retrievedIP} - ${matchingTest ? "PASSED" : "FAILED"}`);
 
         //summary
         appendList(screen, list, "");
