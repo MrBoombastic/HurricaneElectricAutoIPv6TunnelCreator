@@ -5,11 +5,20 @@ module.exports = {
         list.addItem(text);
         screen.render();
     },
+    specificLineSearch: (input, query) => {
+        const lines = input.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].contains(query)) {
+                return lines[i];
+            }
+        }
+    },
     getIP: async () => {
         exec('ip -6 addr show dev he-ipv6', function (error, stdout, stderr) {
             if (error || stderr) return false;
-            if(stdout.includes("scope global")) console.log("FOUND SOMETHING!!!!!!`")
-            return stdout;
+            stdout.on('end', () => {
+                return this.specificLineSearch(stdout, "scope global") || false;
+            });
         });
     }
 };
