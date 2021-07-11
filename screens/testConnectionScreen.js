@@ -7,7 +7,7 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        ip = getIP(),
+        ip = await getIP(),
         tests = {count: 2, passed: 2};
     let ping6 = true;
     list.focus();
