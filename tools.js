@@ -9,7 +9,7 @@ module.exports = {
         const specificLineSearch = (input, query) => {
             const lines = input.split("\n");
             for (let i = 0; i < lines.length; i++) {
-                if (lines[i].contains(query)) {
+                if (lines[i].includes(query)) {
                     return lines[i];
                 }
             }
