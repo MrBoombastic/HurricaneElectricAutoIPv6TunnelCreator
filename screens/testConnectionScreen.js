@@ -7,14 +7,14 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        ip = await getIP(),
+        ip = getIP(),
         tests = {count: 2, passed: 2};
     let ping6 = true;
     list.focus();
     list.addItem("INFO: testing started...");
     screen.append(list);
 
-    appendList(screen, list, `INFO: testing from IP ${ip}`)
+    appendList(screen, list, `INFO: testing from IP ${JSON.stringify(ip["he-ipv6"])}`)
     //stage 1
     try {
         await got.get("https://api64.ipify.org/?format=json", {
