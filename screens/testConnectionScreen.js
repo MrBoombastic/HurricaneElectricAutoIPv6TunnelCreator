@@ -1,40 +1,52 @@
 const styles = require("../styles"),
+    ipv6 = require("ip6addr"),
     {appendList} = require("../tools"),
-
     got = require("got"),
     blessed = require('blessed');
 
-
-
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        ip = null,
         tests = {count: 3, passed: 3};
 
     list.focus();
-    list.addItem("INFO: testing started...");
     screen.append(list);
+    list.addItem("INFO: testing started...");
 
-    //stage1
-    appendList(screen, list, `TEST: getting HE IP block: ${ip ? "PASSED" : "FAILED"}`);
-    if (!ip) tests.passed--;
-
-    appendList(screen, list, `TEST: sending request from IP ${ip}...`);
-    //stage 2
-    if (!ip) {
-        appendList(screen, list, "INFO: No IP found, skipping test.");
-        return tests.passed--;
-    }
-    const req = await got("https://api64.ipify.org/?format=json", {
-        localAddress: ip,
-        dnsLookupIpVersion: "ipv6"
+    const prompt = blessed.prompt({
+        parent: screen,
+        top: 'center',
+        left: 'center',
+        border: 'line',
+        height: 'shrink',
+        label: 'Question',
     });
-    if (await req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
-    else {
-        appendList(screen, list, `RESPONSE: not OK - FAILED!`);
-        return tests.passed--;
-    }
+    prompt.input('What IPv6 from your assigned block do you want to test? ', '', async function (err, ip) {
+        //stage1
+        try {
+            ipv6.parse(ip);
+        } catch (e) {
+            ip = false;
+        }
+        appendList(screen, list, `TEST: verifying received IP: ${ip ? "PASSED" : "FAILED"}`);
+        if (!ip) tests.passed--;
 
+        //stage 2
+        if (!ip) {
+            appendList(screen, list, "INFO: No IP found, skipping test.");
+            return tests.passed--;
+        } else {
+            appendList(screen, list, `TEST: sending request from IP ${ip}`);
+            const req = await got("https://api64.ipify.org/?format=json", {
+                localAddress: ip,
+                dnsLookupIpVersion: "ipv6"
+            });
+            if (req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
+            else {
+                appendList(screen, list, `RESPONSE: not OK - FAILED!`);
+                return tests.passed--;
+            }
+        }
+    });
     /*appendList(screen, list, `CHECK: checking /etc/network/interfaces file presence and access: ${interfacesFilePresent ? "PASSED" : "FAILED"}`);
 
     //stage 2
