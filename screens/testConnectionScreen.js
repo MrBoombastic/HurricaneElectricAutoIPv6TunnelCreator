@@ -8,21 +8,27 @@ const styles = require("../styles"),
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
         ip = getIP(),
-        tests = {count: 2, passed: 2};
+        tests = {count: 3, passed: 3};
     let ping6 = true;
     list.focus();
     list.addItem("INFO: testing started...");
     screen.append(list);
 
-    appendList(screen, list, `INFO: testing from IP ${ip}`)
-    //stage 1
+    //stage1
+    appendList(screen, list, `TEST: getting HE IP block: ${ip ? "PASSED": "FAILED"}`)
+    if(!ip) tests.passed--
+
+    appendList(screen, list, `TEST: sending request from IP ${ip}...`)
+    //stage 2
     try {
-        await got.get("https://api64.ipify.org/?format=json", {
-            localAddress: ip.toString(),
+        if(!ip) throw "no ip"
+        const req = await got.get("https://api64.ipify.org/?format=json", {
+            localAddress: ip,
             dnsLookupIpVersion: "ipv6"
         });
+        if(req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`)
+        else appendList(screen, list, `RESPONSE: not OK - FAILED!`)
     } catch (e) {
-        ping6 = false;
         tests.passed--;
     }
     /*appendList(screen, list, `CHECK: checking /etc/network/interfaces file presence and access: ${interfacesFilePresent ? "PASSED" : "FAILED"}`);
@@ -36,18 +42,6 @@ module.exports = async (screen) => {
     }
     appendList(screen, list, `CHECK: checking /etc/sysctl.conf file presence and access: ${sysctlFilePresent ? "PASSED" : "FAILED"}`);
 
-    //stage 3
-    await commandExists("ip").catch(() => {
-        ipCommandPresent = false;
-        tests.passed--;
-    });
-    appendList(screen, list, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
-
-    //stage 4
-    await commandExists("ping6").catch(() => {
-        ping6CommandPresent = false;
-        tests.passed--;
-    });
     appendList(screen, list, `CHECK: checking ping command presence: ${ping6CommandPresent ? "PASSED" : "FAILED"}`);
 
     //summary
