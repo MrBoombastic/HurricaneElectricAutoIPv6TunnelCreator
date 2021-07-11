@@ -1,23 +1,14 @@
 const styles = require("../styles"),
     {appendList} = require("../tools"),
-    fs = require("fs"),
-    {exec} = require('child_process'),
+
     got = require("got"),
     blessed = require('blessed');
 
-const getIP = () => {
-    return new Promise((resolve, reject) => {
-        exec('ip -6 route | grep -m1 "he-ipv6 proto"', (err, stdout) => {
-            if (err) reject(false);
-            resolve(stdout.split("dev")[0].slice(0, -4));
-        });
-    });
-};
 
 
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        ip = await getIP(),
+        ip = null,
         tests = {count: 3, passed: 3};
 
     list.focus();
@@ -34,11 +25,11 @@ module.exports = async (screen) => {
         appendList(screen, list, "INFO: No IP found, skipping test.");
         return tests.passed--;
     }
-    const req = await got.get("https://api64.ipify.org/?format=json", {
+    const req = await got("https://api64.ipify.org/?format=json", {
         localAddress: ip,
         dnsLookupIpVersion: "ipv6"
     });
-    if (req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
+    if (await req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
     else {
         appendList(screen, list, `RESPONSE: not OK - FAILED!`);
         return tests.passed--;
