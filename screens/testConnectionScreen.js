@@ -7,7 +7,7 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        ip = getIP(),
+        ip = (await getIP)(),
         tests = {count: 3, passed: 3};
     let ping6 = true;
     list.focus();
@@ -15,19 +15,19 @@ module.exports = async (screen) => {
     screen.append(list);
 
     //stage1
-    appendList(screen, list, `TEST: getting HE IP block: ${ip ? "PASSED": "FAILED"}`)
-    if(!ip) tests.passed--
+    appendList(screen, list, `TEST: getting HE IP block: ${ip ? "PASSED" : "FAILED"}`);
+    if (!ip) tests.passed--;
 
-    appendList(screen, list, `TEST: sending request from IP ${ip}...`)
+    appendList(screen, list, `TEST: sending request from IP ${ip}...`);
     //stage 2
     try {
-        if(!ip) throw "no ip"
+        if (!ip) throw "no ip";
         const req = await got.get("https://api64.ipify.org/?format=json", {
             localAddress: ip,
             dnsLookupIpVersion: "ipv6"
         });
-        if(req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`)
-        else appendList(screen, list, `RESPONSE: not OK - FAILED!`)
+        if (req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
+        else appendList(screen, list, `RESPONSE: not OK - FAILED!`);
     } catch (e) {
         tests.passed--;
     }
