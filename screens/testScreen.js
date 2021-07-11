@@ -13,6 +13,7 @@ module.exports = async (screen) => {
         sysctlFilePresent = true,
         ipCommandPresent = true,
         ping6CommandPresent = true;
+
     list.focus();
     list.addItem("INFO: testing started...");
     screen.append(list);

@@ -17,9 +17,9 @@ const getIP = () => {
 
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        ip = JSON.stringify(await getIP()),
+        ip = await getIP(),
         tests = {count: 3, passed: 3};
-    let ping6 = true;
+
     list.focus();
     list.addItem("INFO: testing started...");
     screen.append(list);
@@ -30,17 +30,20 @@ module.exports = async (screen) => {
 
     appendList(screen, list, `TEST: sending request from IP ${ip}...`);
     //stage 2
-    try {
-        if (!ip) throw "no ip";
-        const req = await got.get("https://api64.ipify.org/?format=json", {
-            localAddress: ip,
-            dnsLookupIpVersion: "ipv6"
-        });
-        if (req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
-        else appendList(screen, list, `RESPONSE: not OK - FAILED!`);
-    } catch (e) {
-        tests.passed--;
+    if (!ip) {
+        appendList(screen, list, "INFO: No IP found, skipping test.");
+        return tests.passed--;
     }
+    const req = await got.get("https://api64.ipify.org/?format=json", {
+        localAddress: ip,
+        dnsLookupIpVersion: "ipv6"
+    });
+    if (req.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
+    else {
+        appendList(screen, list, `RESPONSE: not OK - FAILED!`);
+        return tests.passed--;
+    }
+
     /*appendList(screen, list, `CHECK: checking /etc/network/interfaces file presence and access: ${interfacesFilePresent ? "PASSED" : "FAILED"}`);
 
     //stage 2
