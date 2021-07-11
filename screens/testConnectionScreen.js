@@ -20,56 +20,55 @@ module.exports = async (screen) => {
         height: 'shrink',
         label: 'Question',
     });
-    prompt.input('What IPv6 from your assigned block do you want to test? ', '', async function (err, ip) {
+    prompt.input('What IPv6 from your assigned block do you want to test? ', '', async function (err, IP) {
         //stage1
         try {
-            ipv6.parse(ip);
+            ipv6.parse(IP);
         } catch (e) {
-            ip = false;
+            IP = false;
+        } finally {
+            IP.replaceAll(" ", "");
         }
-        appendList(screen, list, `TEST: verifying received IP: ${ip ? "PASSED" : "FAILED"}`);
-        if (!ip) tests.passed--;
+        appendList(screen, list, `TEST: verifying received IP: ${IP ? "PASSED" : "FAILED"}`);
+        if (!IP) tests.passed--;
 
         //stage 2
-        if (!ip) {
-            appendList(screen, list, "INFO: No IP found, skipping test.");
+        let retrievedIP = false;
+        if (!IP) {
+            appendList(screen, list, "INFO: No valid IP found, skipping test.");
             return tests.passed--;
         } else {
-            appendList(screen, list, `TEST: sending request from IP ${ip}`);
+            appendList(screen, list, `TEST: sending request to Ipify from ${IP}`);
             const req = await got.get("https://api64.ipify.org/?format=json", {
-                localAddress: ip,
+                localAddress: IP,
                 dnsLookupIpVersion: "ipv6"
             }).catch(e => e);
-            if (req?.ok) appendList(screen, list, `RESPONSE: ${JSON.stringify(req.body)} - PASSED!`);
-            else {
-                appendList(screen, list, `RESPONSE: not OK (status: ${req?.statusText || req}) - FAILED!`);
+            if (req.statusCode === 200) {
+                appendList(screen, list, `RESPONSE: ${req.body.ip} - PASSED!`);
+                retrievedIP = req.body.ip;
+            } else {
+                appendList(screen, list, `RESPONSE: not OK (${req?.statusText || JSON.stringify(req)}) - FAILED!`);
                 return tests.passed--;
             }
         }
+
+        //stage 3
+        let matchingTest = true;
+        if (retrievedIP !== IP) {
+            matchingTest = false;
+            tests.passed--;
+        }
+        appendList(screen, list, `TEST: checking if given IP and received IP are matching - ${matchingTest ? "PASSED" : "FAILED"}`);
+
+        //summary
+        appendList(screen, list, "");
+        appendList(screen, list, `INFO: All tests done. Passed ${tests.passed} of total ${tests.count} tests.`);
+        appendList(screen, list, `INFO: ${tests.count === tests.passed ? "All test passed. You are free to go!" : "One or more tests failed. This system is not compatible right now."}`);
+
+        appendList(screen, list, "");
+        appendList(screen, list, "1. Exit");
+
     });
-    /*appendList(screen, list, `CHECK: checking /etc/network/interfaces file presence and access: ${interfacesFilePresent ? "PASSED" : "FAILED"}`);
-
-    //stage 2
-    try {
-        fs.accessSync("/etc/sysctl.conf");
-    } catch (e) {
-        sysctlFilePresent = false;
-        tests.passed--;
-    }
-    appendList(screen, list, `CHECK: checking /etc/sysctl.conf file presence and access: ${sysctlFilePresent ? "PASSED" : "FAILED"}`);
-
-    appendList(screen, list, `CHECK: checking ping command presence: ${ping6CommandPresent ? "PASSED" : "FAILED"}`);
-
-    //summary
-    appendList(screen, list, "");
-    appendList(screen, list, `INFO: All tests done. Passed ${tests.passed} of total ${tests.count} tests.`);
-    appendList(screen, list, `INFO: ${tests.count === tests.passed ? "All test passed. You are free to go!" : "One or more tests failed. This system is not compatible right now."}`);
-
-    appendList(screen, list, "");
-    */
-
-    appendList(screen, list, "1. Exit");
-
     //Select exit button
     list.select(Infinity);
 
