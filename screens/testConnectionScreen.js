@@ -27,7 +27,7 @@ module.exports = async (screen) => {
         } catch (e) {
             IP = false;
         } finally {
-            IP.replaceAll(" ", "");
+            IP?.replaceAll(" ", "");
         }
         appendList(screen, list, `TEST: verifying received IP: ${IP ? "PASSED" : "FAILED"}`);
         if (!IP) tests.passed--;
@@ -44,8 +44,8 @@ module.exports = async (screen) => {
                 dnsLookupIpVersion: "ipv6"
             }).catch(e => e);
             if (req.statusCode === 200) {
-                appendList(screen, list, `RESPONSE: ${req.body.ip} - PASSED!`);
-                retrievedIP = req.body.ip;
+                retrievedIP = JSON.parse(req.body).ip;
+                appendList(screen, list, `RESPONSE: ${retrievedIP} - PASSED!`);
             } else {
                 appendList(screen, list, `RESPONSE: not OK (${req?.statusText || JSON.stringify(req)}) - FAILED!`);
                 return tests.passed--;
@@ -58,7 +58,7 @@ module.exports = async (screen) => {
             matchingTest = false;
             tests.passed--;
         }
-        appendList(screen, list, `TEST: checking if given IP and received IP are matching - ${matchingTest ? "PASSED" : "FAILED"}`);
+        appendList(screen, list, `TEST: checking if given IP and received IP are matching\n(${IP} vs ${retrievedIP} - ${matchingTest ? "PASSED" : "FAILED"}`);
 
         //summary
         appendList(screen, list, "");
@@ -68,9 +68,9 @@ module.exports = async (screen) => {
         appendList(screen, list, "");
         appendList(screen, list, "1. Exit");
 
+        //Select exit button
+        list.select(Infinity);
     });
-    //Select exit button
-    list.select(Infinity);
 
     list.on("select", function (data) {
         if (data.content === "1. Exit") require("./welcomeScreen")(screen);
