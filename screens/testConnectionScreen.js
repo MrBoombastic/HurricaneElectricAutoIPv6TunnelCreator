@@ -9,7 +9,7 @@ const getIP = () => {
     return new Promise((resolve, reject) => {
         exec('ip -6 route | grep -m1 "he-ipv6 proto"', (err, stdout) => {
             if (err) reject(false);
-            resolve(stdout.split("dev")[0].slice(0, -3));
+            resolve(stdout.split("dev")[0].slice(0, -4));
         });
     });
 };
