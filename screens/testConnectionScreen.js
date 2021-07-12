@@ -31,7 +31,7 @@ module.exports = async (screen) => {
             IP = IP?.replaceAll(" ", "");
             tests.passed++;
         }
-        appendList(screen, list, `TEST: verifying received IP: ${IP ? "PASSED" : "FAILED"}`);
+        appendList(screen, list, `TEST: verifying received IP - ${IP ? "PASSED" : "FAILED"}`);
 
         //stage 2
         let retrievedIP = false;
@@ -55,7 +55,7 @@ module.exports = async (screen) => {
         const matchingTest = (retrievedIP === IP);
         if (matchingTest) tests.passed++
 
-        appendList(screen, list, `TEST: checking if given IP and received IP are matching (${IP} vs ${retrievedIP} - ${matchingTest ? "PASSED" : "FAILED"}`);
+        appendList(screen, list, `TEST: checking if given IP and received IP are matching (${IP} vs ${retrievedIP}) - ${matchingTest ? "PASSED" : "FAILED"}`);
         //todo: youtube and fb ping test
 
 

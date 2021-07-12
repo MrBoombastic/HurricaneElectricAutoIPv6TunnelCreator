@@ -6,6 +6,7 @@ module.exports = {
         width: '70%',
         height: '70%',
         keys: true,
+        mouse: true,
         border: {
             type: 'line'
         },
