@@ -103,9 +103,12 @@ iface he-ipv6 inet6 v4tunnel
                     });
                     spawn(`(sudo crontab -l 2>/dev/null | grep -v '^[a-zA-Z]'; echo "@reboot sudo ip -6 route replace local ${data.routed} dev lo") | sort - | uniq - | sudo crontab -`, {shell: true})
                         .stderr.on('data', () => {
-                        return appendList(screen, list, `ERROR: failed to persist above command. Add it to cron manually.`);
+                        return appendList(screen, list, `ERROR: failed to add '@reboot ip -6 route replace local ${data.routed} dev lo' to cron.`);
                     });
                     appendList(screen, list, `INFO: new configuration saved and enabled successfully! Reboot now!`);
+
+                    appendList(screen, list, ``);
+                    appendList(screen, list, `1.  Exit`);
                 });
             });
         });
