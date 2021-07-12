@@ -1,5 +1,5 @@
 const styles = require("../styles"),
-    {appendList} = require("../tools"),
+    {appendList, printTestSummary} = require("../tools"),
     fs = require("fs"),
     os = require("os"),
     commandExists = require('command-exists'),
@@ -52,17 +52,9 @@ module.exports = async (screen) => {
     appendList(screen, list, `CHECK: checking ping command presence: ${ping6CommandPresent ? "PASSED" : "FAILED"}`);
 
     //summary
-    appendList(screen, list, "");
-    appendList(screen, list, `INFO: All tests done. Passed ${tests.passed} of total ${tests.count} tests.`);
-    appendList(screen, list, `INFO: ${tests.count === tests.passed ? "All test passed. You are free to go!" : "One or more tests failed. This system is not compatible right now."}`);
-
-    appendList(screen, list, "");
-    appendList(screen, list, "1. Exit");
-
-    //Select exit button
-    list.select(Infinity);
+    printTestSummary(screen, list, tests, "This system is not compatible right now.");
 
     list.on("select", function (data) {
-        if (data.content === "1. Exit") require("./welcomeScreen")(screen);
+        if (data.content === "1.  Exit") require("./welcomeScreen")(screen);
     });
 };

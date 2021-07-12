@@ -2,7 +2,7 @@ module.exports = {
     list: {
         top: 'center',
         left: 'center',
-        align: 'center',
+        align: 'left',
         width: '70%',
         height: '70%',
         keys: true,
