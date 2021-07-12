@@ -1,6 +1,7 @@
 const styles = require("../styles"),
     {appendList, validateIP, failSetup, request4} = require("../tools"),
     blessed = require('blessed'),
+    {spawn} = require('child_process'),
     fs = require("fs"),
     data = {
         address: null,
@@ -8,7 +9,8 @@ const styles = require("../styles"),
         endpoint: null,
         local: null,
         ttl: 255,
-        gateway: null
+        gateway: null,
+        routed: null
     };
 
 module.exports = async (screen) => {
@@ -52,7 +54,7 @@ module.exports = async (screen) => {
                     data.local = localIP;
                 } else return failSetup(screen, list, `Problem fetching ${stageText}!`);
 
-                //STAGE 5 - LAST ONE
+                //STAGE 5
                 stageText = "Server IPv6 Address";
                 blessed.prompt(styles.prompt(screen)).input(`Enter ${stageText}`, '', async function (err, gateway) {
                     gateway = validateIP(gateway);
@@ -60,20 +62,49 @@ module.exports = async (screen) => {
                     appendList(screen, list, `INFO: ${stageText} is ${endpoint}`);
                     data.gateway = gateway;
 
-                    appendList(screen, list, `INFO: generating new 'interfaces' file...`);
-                    let interfaces = await fs.readFileSync("/etc/network/interfaces", "UTF-8");
-                    interfaces += `
+                    //STAGE 6 - LAST ONE!!!
+                    stageText = "Routed /64 or /48 Prefix";
+                    blessed.prompt(styles.prompt(screen)).input(`Enter ${stageText} (with /64 or /48 at the end)`, '', async function (err, routed) {
+                        if (!routed) return failSetup(screen, list, `${stageText} is not valid!`);
+                        appendList(screen, list, `INFO: ${stageText} is ${routed}`);
+                        data.routed = routed;
 
-auto he-ipv6
-iface he-ipv6 inet6 v4tunnel
-        address ${data.address}
-        netmask ${data.netmask}
-        endpoint ${data.endpoint}
-        local ${data.local}
-        ttl 255
-        gateway ${data.gateway}`;
-                    await fs.writeFileSync("./interfaces.new", interfaces);
+                        appendList(screen, list, `INFO: generating new 'interfaces' file...`);
+                        let interfaces = await fs.readFileSync("/etc/network/interfaces", "UTF-8");
+                        interfaces += `
 
+auto he-ipv6                            #HEAT
+iface he-ipv6 inet6 v4tunnel            #HEAT
+        address ${data.address}         #HEAT
+        netmask ${data.netmask}         #HEAT
+        endpoint ${data.endpoint}       #HEAT
+        local ${data.local}             #HEAT
+        ttl 255                         #HEAT
+        gateway ${data.gateway}         #HEAT
+
+`;
+                        await fs.writeFileSync("./interfaces.new", interfaces);
+                        appendList(screen, list, `INFO: new 'interfaces' file generated`);
+                        const backupFilename = `interfaces-${Date.now()}.bak`;
+                        appendList(screen, list, `INFO: backing up 'interfaces' file (${backupFilename})`);
+                        await fs.copyFileSync("/etc/network/interfaces", `/etc/network/${backupFilename}`);
+                        appendList(screen, list, `INFO: trying to overwrite current 'interfaces' file...`);
+                        await fs.writeFileSync("./etc/network/interfaces", interfaces);
+                        appendList(screen, list, `INFO: file overwritten. Enabling IPv6 in the system...`);
+                        spawn('sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
+                            .stderr.on('data', () => {
+                            return appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" yourself.`);
+                        });
+                        spawn("echo 'net.ipv6.ip_nonlocal_bind = 1' >> /etc/sysctl.conf", {shell: true})
+                            .stderr.on('data', () => {
+                            return appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
+                        });
+                        spawn(`ip -6 route replace local ${data.routed} dev lo`, {shell: true})
+                            .stderr.on('data', () => {
+                            return appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev lo' manually.`);
+                        });
+                        appendList(screen, list, `INFO: new configuration saved and enabled successfully!`)
+                    });
                 });
             });
         });
