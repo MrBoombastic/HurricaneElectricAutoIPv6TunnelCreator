@@ -109,6 +109,8 @@ iface he-ipv6 inet6 v4tunnel
 
                     appendList(screen, list, ``);
                     appendList(screen, list, `1.  Exit`);
+
+                    list.select(Infinity);
                 });
             });
         });
