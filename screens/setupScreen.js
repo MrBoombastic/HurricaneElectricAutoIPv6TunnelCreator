@@ -1,7 +1,6 @@
 const styles = require("../styles"),
     {appendList, validateIP, failSetup, request4} = require("../tools"),
     blessed = require('blessed'),
-    crontab = require("crontab"),
     {spawn} = require('child_process'),
     fs = require("fs"),
     data = {
@@ -94,7 +93,7 @@ iface he-ipv6 inet6 v4tunnel
                         .stderr.on('data', () => {
                         return appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" manually.`);
                     });
-                    spawn("sudo echo 'net.ipv6.ip_nonlocal_bind = 1' >> sudo /etc/sysctl.conf", {shell: true})
+                    spawn("sudo echo 'net.ipv6.ip_nonlocal_bind = 1' >> /etc/sysctl.conf", {shell: true})
                         .stderr.on('data', () => {
                         return appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
                     });
@@ -102,9 +101,9 @@ iface he-ipv6 inet6 v4tunnel
                         .stderr.on('data', () => {
                         return appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev lo' manually.`);
                     });
-                    crontab.load(function (err, crontab) {
-                        const job = crontab.create(`sudo ip -6 route replace local ${data.routed} dev lo`, '@reboot');
-                        if (job === null) return appendList(screen, list, `ERROR: failed to persist above command. Add it to cron manually.`);
+                    spawn(`sudo echo "$(sudo echo '@reboot sudo ip -6 route replace local ${data.routed} dev lo' ; crontab -l 2>&1)" | crontab -`, {shell: true})
+                        .stderr.on('data', () => {
+                        return appendList(screen, list, `ERROR: failed to persist above command. Add it to cron manually.`);
                     });
                     appendList(screen, list, `INFO: new configuration saved and enabled successfully! Reboot now!`);
                 });
