@@ -16,6 +16,7 @@ module.exports = async (screen) => {
         top: 'center',
         left: 'center',
         border: 'line',
+        mouse: false,
         height: 'shrink',
         label: 'Question',
     });
