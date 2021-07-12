@@ -89,7 +89,7 @@ iface he-ipv6 inet6 v4tunnel            #HEAT
                         appendList(screen, list, `INFO: backing up 'interfaces' file (${backupFilename})`);
                         await fs.copyFileSync("/etc/network/interfaces", `/etc/network/${backupFilename}`);
                         appendList(screen, list, `INFO: trying to overwrite current 'interfaces' file...`);
-                        await fs.writeFileSync("./etc/network/interfaces", interfaces);
+                        await fs.writeFileSync("/etc/network/interfaces", interfaces);
                         appendList(screen, list, `INFO: file overwritten. Enabling IPv6 in the system...`);
                         spawn('sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
                             .stderr.on('data', () => {

@@ -11,7 +11,7 @@ module.exports = {
         },
         style: {
             fg: 'white',
-            bg: '#0fb7ff',
+            bg: '#0f37ff',
             border:
                 {
                     fg: '#f0f0f0'
