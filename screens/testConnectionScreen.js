@@ -53,8 +53,7 @@ module.exports = async (screen) => {
 
         //stage 3
         const matchingTest = (retrievedIP === IP);
-        if (matchingTest) return printTestSummary(screen, list, tests);
-        else tests.passed++;
+        if (matchingTest) tests.passed++
 
         appendList(screen, list, `TEST: checking if given IP and received IP are matching (${IP} vs ${retrievedIP} - ${matchingTest ? "PASSED" : "FAILED"}`);
         //todo: youtube and fb ping test
