@@ -101,7 +101,7 @@ iface he-ipv6 inet6 v4tunnel
                         .stderr.on('data', () => {
                         return appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev lo' manually.`);
                     });
-                    spawn(`sudo echo "$(sudo echo '@reboot sudo ip -6 route replace local ${data.routed} dev lo' ; crontab -l 2>&1)" | crontab -`, {shell: true})
+                    spawn(`(sudo crontab -l 2>/dev/null | grep -v '^[a-zA-Z]'; echo "@reboot sudo ip -6 route replace local ${data.routed} dev lo") | sort - | uniq - | sudo crontab -`, {shell: true})
                         .stderr.on('data', () => {
                         return appendList(screen, list, `ERROR: failed to persist above command. Add it to cron manually.`);
                     });
