@@ -21,10 +21,14 @@ module.exports = (screen) => {
         switch (data.position.top) {
             case 0:
                 return await require("./testScreen")(screen);
+            case 1:
+                return await require("./setupScreen")(screen);
             case 3:
                 return await require("./testConnectionScreen")(screen);
             case 5:
-                process.exit(0)
+                return process.exit(0);
+            default:
+                process.exit(0);
         }
     });
 };

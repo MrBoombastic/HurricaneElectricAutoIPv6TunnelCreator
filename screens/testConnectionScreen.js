@@ -1,6 +1,5 @@
 const styles = require("../styles"),
-    ipv6 = require("ip6addr"),
-    {appendList, printTestSummary, request} = require("../tools"),
+    {appendList, printTestSummary, request6, validateIP} = require("../tools"),
     blessed = require('blessed');
 
 module.exports = async (screen) => {
@@ -10,15 +9,10 @@ module.exports = async (screen) => {
     list.focus();
     screen.append(list);
 
-
-    const prompt = blessed.prompt(styles.ipPrompt(screen));
+    const prompt = blessed.prompt(styles.prompt(screen));
     prompt.input('What IPv6 from your assigned block do you want to test?', '', async function (err, IP) {
         //stage1
-        try {
-            ipv6.parse(IP);
-        } catch (e) {
-            IP = false;
-        }
+        IP = validateIP(IP)
         list.addItem("INFO: testing started...");
         if (IP) {
             IP = IP?.replaceAll(" ", "");
@@ -33,7 +27,7 @@ module.exports = async (screen) => {
             return printTestSummary(screen, list, tests);
         } else {
             appendList(screen, list, `TEST: sending request to Ipify from ${IP}`);
-            const req = await request(IP, "https://api64.ipify.org/?format=json")
+            const req = await request6(IP, "https://api64.ipify.org/?format=json")
             if (req.statusCode === 200) {
                 retrievedIP = JSON.parse(req.body).ip;
                 appendList(screen, list, `RESPONSE: ${retrievedIP} - PASSED!`);

@@ -26,11 +26,11 @@ module.exports = {
     },
     tipText: {
         align: "center",
-        top: "90%",
+        top: "93%",
         width: '100%',
         content: "NOTE: You can hit q, escape or Ctrl-C buttons to exit at any time!",
     },
-    ipPrompt: (screen) => {
+    prompt: (screen) => {
         return {
             parent: screen,
             top: 'center',
