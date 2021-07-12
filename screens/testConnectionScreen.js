@@ -4,7 +4,7 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        tests = {count: 3, passed: 0};
+        tests = {count: 2, passed: 0};
 
     list.focus();
     screen.append(list);
@@ -39,10 +39,6 @@ module.exports = async (screen) => {
         }
 
         //stage 3
-        const matchingTest = (retrievedIP === IP);
-        if (matchingTest) tests.passed++
-
-        appendList(screen, list, `TEST: checking if given IP and received IP are matching (${IP} vs ${retrievedIP}) - ${matchingTest ? "PASSED" : "FAILED"}`);
         //todo: youtube and fb ping test
 
 

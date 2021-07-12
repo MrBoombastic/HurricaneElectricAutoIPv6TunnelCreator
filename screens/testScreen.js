@@ -8,11 +8,10 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const list = blessed.list(styles.list),
-        tests = {count: 4, passed: 4};
+        tests = {count: 3, passed: 3};
     let interfacesFilePresent = true,
         sysctlFilePresent = true,
-        ipCommandPresent = true,
-        ping6CommandPresent = true;
+        ipCommandPresent = true;
 
     list.focus();
     list.addItem("INFO: testing started...");
@@ -43,13 +42,6 @@ module.exports = async (screen) => {
         tests.passed--;
     });
     appendList(screen, list, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
-
-    //stage 4
-    await commandExists("ping6").catch(() => {
-        ping6CommandPresent = false;
-        tests.passed--;
-    });
-    appendList(screen, list, `CHECK: checking ping command presence: ${ping6CommandPresent ? "PASSED" : "FAILED"}`);
 
     //summary
     printTestSummary(screen, list, tests, "This system is not compatible right now.");

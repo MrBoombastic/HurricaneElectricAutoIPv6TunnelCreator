@@ -1,3 +1,5 @@
+const packagejson = require("./package.json")
+
 module.exports = {
     list: {
         top: 'center',
@@ -22,7 +24,7 @@ module.exports = {
         align: "center",
         top: "8%",
         width: '100%',
-        content: "Welcome to the one and only - HurricaneElectricAutoIPv6TunnelCreator (or HEAT). :D",
+        content: `HurricaneElectricAutoIPv6TunnelCreator (HEAT) version ${packagejson.version} :D`,
     },
     tipText: {
         align: "center",
