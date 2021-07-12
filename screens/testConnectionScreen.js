@@ -11,16 +11,8 @@ module.exports = async (screen) => {
     screen.append(list);
 
 
-    const prompt = blessed.prompt({
-        parent: screen,
-        top: 'center',
-        left: 'center',
-        border: 'line',
-        mouse: false,
-        height: 'shrink',
-        label: 'Question',
-    });
-    prompt.input('What IPv6 from your assigned block do you want to test? ', '', async function (err, IP) {
+    const prompt = blessed.prompt(styles.ipPrompt(screen));
+    prompt.input('What IPv6 from your assigned block do you want to test?', '', async function (err, IP) {
         //stage1
         try {
             ipv6.parse(IP);

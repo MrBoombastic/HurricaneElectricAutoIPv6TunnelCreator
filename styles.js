@@ -6,7 +6,6 @@ module.exports = {
         width: '70%',
         height: '70%',
         keys: true,
-        mouse: true,
         border: {
             type: 'line'
         },
@@ -30,5 +29,16 @@ module.exports = {
         top: "90%",
         width: '100%',
         content: "NOTE: You can hit q, escape or Ctrl-C buttons to exit at any time!",
+    },
+    ipPrompt: (screen) => {
+        return {
+            parent: screen,
+            top: 'center',
+            left: 'center',
+            border: 'line',
+            mouse: false,
+            height: 'shrink',
+            label: 'Question',
+        };
     }
 };
