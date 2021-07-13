@@ -1,5 +1,5 @@
 const styles = require("../styles"),
-    {appendList, validateIP, failSetup, request4} = require("../tools"),
+    {appendList, validateIP, failSetup, request4, interfacesCreator, IPv6Enabler} = require("../tools"),
     blessed = require('blessed'),
     {spawn} = require('child_process'),
     fs = require("fs"),
@@ -58,55 +58,20 @@ module.exports = async (screen) => {
                 //STAGE 5 - LAST ONE!!!
                 stageText = "Routed /64 or /48 Prefix";
                 blessed.prompt(styles.prompt(screen)).input(`Enter ${stageText} (with /64 or /48 at the end)`, '', async function (err, routed) {
-                    if (!routed) return failSetup(screen, list, `${stageText} is not valid!`);
+                    if (!validateIP(routed.split("/")[0]) || !data.routed.split("/")?.[1]) return failSetup(screen, list, `${stageText} is not valid!`);
                     appendList(screen, list, `INFO: ${stageText} is ${routed}`);
                     data.routed = routed;
 
-                    data.netmask = data.routed.slice(-2);
+                    data.netmask = data.routed.split("/")[1]
                     appendList(screen, list, `INFO: Detected Netmask is ${data.netmask}`);
 
-                    appendList(screen, list, `INFO: generating new 'interfaces' file...`);
-                    let interfaces = await fs.readFileSync("/etc/network/interfaces", "UTF-8");
-                    interfaces += `
-
-#HEAT-start
-auto he-ipv6
-iface he-ipv6 inet6 v4tunnel
-        address ${data.address}
-        netmask ${data.routed.slice(-2)}
-        endpoint ${data.endpoint}
-        local ${data.local}
-        ttl 255
-        gateway ${data.gateway}
-#HEAT-end
-
-`;
-                    await fs.writeFileSync("./interfaces.new", interfaces);
-                    appendList(screen, list, `INFO: new 'interfaces' file generated`);
-                    const backupFilename = `interfaces-${Date.now()}.bak`;
-                    appendList(screen, list, `INFO: backing up 'interfaces' file (${backupFilename})`);
-                    await fs.copyFileSync("/etc/network/interfaces", `/etc/network/${backupFilename}`);
-                    appendList(screen, list, `INFO: trying to overwrite current 'interfaces' file...`);
-                    await fs.writeFileSync("/etc/network/interfaces", interfaces);
+                    await interfacesCreator(screen, list, data)
                     appendList(screen, list, `INFO: file overwritten. Enabling IPv6 in the system...`);
-                    spawn('sudo sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
-                        .stderr.on('data', () => {
-                        return appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" manually.`);
-                    });
-                    spawn("sudo echo 'net.ipv6.ip_nonlocal_bind = 1' >> /etc/sysctl.conf", {shell: true})
-                        .stderr.on('data', () => {
-                        return appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
-                    });
-                    spawn(`sudo ip -6 route replace local ${data.routed} dev lo`, {shell: true})
-                        .stderr.on('data', () => {
-                        return appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev lo' manually.`);
-                    });
-                    spawn(`(sudo crontab -l 2>/dev/null | grep -v '^[a-zA-Z]'; echo "@reboot sudo ip -6 route replace local ${data.routed} dev lo") | sort - | uniq - | sudo crontab -`, {shell: true})
-                        .stderr.on('data', () => {
-                        return appendList(screen, list, `ERROR: failed to add '@reboot ip -6 route replace local ${data.routed} dev lo' to cron.`);
-                    });
+
+                    IPv6Enabler(screen, list, data);
                     appendList(screen, list, `INFO: new configuration saved and enabled successfully! Reboot now!`);
 
+                    //Finish
                     appendList(screen, list, ``);
                     appendList(screen, list, `1.  Exit`);
 
