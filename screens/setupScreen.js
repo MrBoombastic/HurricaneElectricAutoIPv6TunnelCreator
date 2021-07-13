@@ -60,11 +60,12 @@ module.exports = async (screen) => {
                 //STAGE 5 - LAST ONE!!!
                 stageText = "Routed /64 or /48 Prefix";
                 prompt(styles.prompt(screen)).input(`Enter ${stageText} (with /64 or /48 at the end)`, '', async function (err, routed) {
-                    if (!validateIP(routed.split("/")[0]) || !data.routed.split("/")?.[1]) return failSetup(screen, setupList, `${stageText} is not valid!`);
+                    const split = routed?.split("/")
+                    if (!validateIP(split?.[0]) || !split?.[1]) return failSetup(screen, setupList, `${stageText} is not valid!`);
                     appendList(screen, setupList, `INFO: ${stageText} is ${routed}`);
                     data.routed = routed;
 
-                    data.netmask = data.routed.split("/")[1]
+                    data.netmask = split[1]
                     appendList(screen, setupList, `INFO: Detected Netmask is ${data.netmask}`);
 
                     await interfacesCreator(screen, setupList, data)
