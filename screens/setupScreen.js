@@ -1,8 +1,6 @@
 const styles = require("../styles"),
     {appendList, validateIP, failSetup, request4, interfacesCreator, IPv6Enabler} = require("../tools"),
-    blessed = require('blessed'),
-    {spawn} = require('child_process'),
-    fs = require("fs"),
+    {list, prompt} = require('blessed'),
     data = {
         address: null,
         netmask: null,
@@ -14,74 +12,74 @@ const styles = require("../styles"),
     };
 
 module.exports = async (screen) => {
-    const list = blessed.list(styles.list);
-    list.focus();
-    screen.append(list);
+    const setupList = list(styles.list);
+    setupList.focus();
+    screen.append(setupList);
 
     //WELCOME TO CALLBACK HELL
     //BECAUSE SOMEHOW ASYNC/AWAIT DOESN'T WORK
 
     //STAGE 1
     let stageText = "Client IPv6 Address";
-    blessed.prompt(styles.prompt(screen)).input(`Enter ${stageText}`, '', async function (err, IP) {
+    prompt(styles.prompt(screen)).input(`Enter ${stageText}`, '', async function (err, IP) {
         IP = validateIP(IP);
-        if (!IP) return failSetup(screen, list, `${stageText} is not valid! Maybe try without '/64'.`);
-        appendList(screen, list, `INFO: ${stageText} is ${IP}`);
+        if (!IP) return failSetup(screen, setupList, `${stageText} is not valid! Maybe try without '/64'.`);
+        appendList(screen, setupList, `INFO: ${stageText} is ${IP}`);
         data.address = IP;
 
         //STAGE 2
         stageText = "Server IPv4 Address";
-        blessed.prompt(styles.prompt(screen)).input(`Enter ${stageText}`, '', async function (err, endpoint) {
+        prompt(styles.prompt(screen)).input(`Enter ${stageText}`, '', async function (err, endpoint) {
             endpoint = validateIP(endpoint);
-            if (!endpoint) return failSetup(screen, list, `${stageText} is not valid!`);
-            appendList(screen, list, `INFO: ${stageText} is ${endpoint}`);
+            if (!endpoint) return failSetup(screen, setupList, `${stageText} is not valid!`);
+            appendList(screen, setupList, `INFO: ${stageText} is ${endpoint}`);
             data.endpoint = endpoint;
 
             //STAGE 3
             stageText = "Client IPv4 Address";
-            appendList(screen, list, `INFO: fetching ${stageText} automatically...`);
+            appendList(screen, setupList, `INFO: fetching ${stageText} automatically...`);
             const req = await request4("https://api64.ipify.org/?format=json");
             if (req.statusCode === 200) {
                 const localIP = JSON.parse(req.body)?.ip;
-                appendList(screen, list, `RESPONSE: ${stageText} is ${localIP}`);
+                appendList(screen, setupList, `RESPONSE: ${stageText} is ${localIP}`);
                 data.local = localIP;
-            } else return failSetup(screen, list, `Problem fetching ${stageText}!`);
+            } else return failSetup(screen, setupList, `Problem fetching ${stageText}!`);
 
             //STAGE 4
             stageText = "Server IPv6 Address";
-            blessed.prompt(styles.prompt(screen)).input(`Enter ${stageText}`, '', async function (err, gateway) {
+            prompt(styles.prompt(screen)).input(`Enter ${stageText}`, '', async function (err, gateway) {
                 gateway = validateIP(gateway);
-                if (!gateway) return failSetup(screen, list, `${stageText} is not valid! Maybe try without '/64'.`);
-                appendList(screen, list, `INFO: ${stageText} is ${endpoint}`);
+                if (!gateway) return failSetup(screen, setupList, `${stageText} is not valid! Maybe try without '/64'.`);
+                appendList(screen, setupList, `INFO: ${stageText} is ${endpoint}`);
                 data.gateway = gateway;
 
                 //STAGE 5 - LAST ONE!!!
                 stageText = "Routed /64 or /48 Prefix";
-                blessed.prompt(styles.prompt(screen)).input(`Enter ${stageText} (with /64 or /48 at the end)`, '', async function (err, routed) {
-                    if (!validateIP(routed.split("/")[0]) || !data.routed.split("/")?.[1]) return failSetup(screen, list, `${stageText} is not valid!`);
-                    appendList(screen, list, `INFO: ${stageText} is ${routed}`);
+                prompt(styles.prompt(screen)).input(`Enter ${stageText} (with /64 or /48 at the end)`, '', async function (err, routed) {
+                    if (!validateIP(routed.split("/")[0]) || !data.routed.split("/")?.[1]) return failSetup(screen, setupList, `${stageText} is not valid!`);
+                    appendList(screen, setupList, `INFO: ${stageText} is ${routed}`);
                     data.routed = routed;
 
                     data.netmask = data.routed.split("/")[1]
-                    appendList(screen, list, `INFO: Detected Netmask is ${data.netmask}`);
+                    appendList(screen, setupList, `INFO: Detected Netmask is ${data.netmask}`);
 
-                    await interfacesCreator(screen, list, data)
-                    appendList(screen, list, `INFO: file overwritten. Enabling IPv6 in the system...`);
+                    await interfacesCreator(screen, setupList, data)
+                    appendList(screen, setupList, `INFO: file overwritten. Enabling IPv6 in the system...`);
 
-                    IPv6Enabler(screen, list, data);
-                    appendList(screen, list, `INFO: new configuration saved and enabled successfully! Reboot now!`);
+                    IPv6Enabler(screen, setupList, data);
+                    appendList(screen, setupList, `INFO: new configuration saved and enabled successfully! Reboot now!`);
 
                     //Finish
-                    appendList(screen, list, ``);
-                    appendList(screen, list, `1.  Exit`);
+                    appendList(screen, setupList, ``);
+                    appendList(screen, setupList, `1.  Exit`);
 
-                    list.select(Infinity);
+                    setupList.select(Infinity);
                 });
             });
         });
     });
 
-    list.on("select", function (data) {
+    setupList.on("select", function (data) {
         if (data.content === "1.  Exit") require("./welcomeScreen")(screen);
     });
 };

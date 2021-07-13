@@ -1,40 +1,39 @@
 const styles = require("../styles"),
     {appendList, printTestSummary, request6, validateIP} = require("../tools"),
-    blessed = require('blessed');
+    {list, prompt} = require('blessed');
 
 module.exports = async (screen) => {
-    const list = blessed.list(styles.list),
+    const testList = list(styles.list),
         tests = {count: 2, passed: 0};
 
-    list.focus();
-    screen.append(list);
+    testList.focus();
+    screen.append(testList);
 
-    const prompt = blessed.prompt(styles.prompt(screen));
-    prompt.input('What IPv6 from your assigned block do you want to test?', '', async function (err, IP) {
+    prompt(styles.prompt(screen)).input('What IPv6 from your assigned block do you want to test?', '', async function (err, IP) {
         //stage1
-        IP = validateIP(IP)
-        list.addItem("INFO: testing started...");
+        IP = validateIP(IP);
+        testList.addItem("INFO: testing started...");
         if (IP) {
             IP = IP?.replaceAll(" ", "");
             tests.passed++;
         }
-        appendList(screen, list, `TEST: verifying received IP - ${IP ? "PASSED" : "FAILED"}`);
+        appendList(screen, testList, `TEST: verifying received IP - ${IP ? "PASSED" : "FAILED"}`);
 
         //stage 2
         let retrievedIP = false;
         if (!IP) {
-            appendList(screen, list, "INFO: No valid IP found, skipping test.");
-            return printTestSummary(screen, list, tests);
+            appendList(screen, testList, "INFO: No valid IP found, skipping test.");
+            return printTestSummary(screen, testList, tests);
         } else {
-            appendList(screen, list, `TEST: sending request to Ipify from ${IP}`);
-            const req = await request6(IP, "https://api64.ipify.org/?format=json")
+            appendList(screen, testList, `TEST: sending request to Ipify from ${IP}`);
+            const req = await request6(IP, "https://api64.ipify.org/?format=json");
             if (req.statusCode === 200) {
                 retrievedIP = JSON.parse(req.body).ip;
-                appendList(screen, list, `RESPONSE: ${retrievedIP} - PASSED!`);
+                appendList(screen, testList, `RESPONSE: ${retrievedIP} - PASSED!`);
                 tests.passed++;
             } else {
-                appendList(screen, list, `RESPONSE: not OK (${req?.statusText || req?.code || JSON.stringify(req)}) - FAILED!`);
-                return printTestSummary(screen, list, tests);
+                appendList(screen, testList, `RESPONSE: not OK (${req?.statusText || req?.code || JSON.stringify(req)}) - FAILED!`);
+                return printTestSummary(screen, testList, tests);
             }
         }
 
@@ -43,10 +42,10 @@ module.exports = async (screen) => {
 
 
         //summary
-        printTestSummary(screen, list, tests);
+        printTestSummary(screen, testList, tests);
     });
 
-    list.on("select", function (data) {
+    testList.on("select", function (data) {
         if (data.content === "1.  Exit") require("./welcomeScreen")(screen);
     });
 };

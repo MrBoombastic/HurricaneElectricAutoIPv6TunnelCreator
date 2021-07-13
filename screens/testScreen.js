@@ -3,20 +3,20 @@ const styles = require("../styles"),
     fs = require("fs"),
     os = require("os"),
     commandExists = require('command-exists'),
-    blessed = require('blessed');
+    {list} = require('blessed');
 
 
 module.exports = async (screen) => {
-    const list = blessed.list(styles.list),
+    const testList = list(styles.list),
         tests = {count: 3, passed: 3};
     let interfacesFilePresent = true,
         sysctlFilePresent = true,
         ipCommandPresent = true;
 
-    list.focus();
-    list.addItem("INFO: testing started...");
-    screen.append(list);
-    appendList(screen, list, `INFO: current system is ${os.version()} ${os.release()} (${os.platform()})`);
+    testList.focus();
+    testList.addItem("INFO: testing started...");
+    screen.append(testList);
+    appendList(screen, testList, `INFO: current system is ${os.version()} ${os.release()} (${os.platform()})`);
 
     //stage 1
     try {
@@ -25,7 +25,7 @@ module.exports = async (screen) => {
         interfacesFilePresent = false;
         tests.passed--;
     }
-    appendList(screen, list, `CHECK: checking /etc/network/interfaces file presence and access: ${interfacesFilePresent ? "PASSED" : "FAILED"}`);
+    appendList(screen, testList, `CHECK: checking /etc/network/interfaces file presence and access: ${interfacesFilePresent ? "PASSED" : "FAILED"}`);
 
     //stage 2
     try {
@@ -34,19 +34,19 @@ module.exports = async (screen) => {
         sysctlFilePresent = false;
         tests.passed--;
     }
-    appendList(screen, list, `CHECK: checking /etc/sysctl.conf file presence and access: ${sysctlFilePresent ? "PASSED" : "FAILED"}`);
+    appendList(screen, testList, `CHECK: checking /etc/sysctl.conf file presence and access: ${sysctlFilePresent ? "PASSED" : "FAILED"}`);
 
     //stage 3
     await commandExists("ip").catch(() => {
         ipCommandPresent = false;
         tests.passed--;
     });
-    appendList(screen, list, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
+    appendList(screen, testList, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
 
     //summary
-    printTestSummary(screen, list, tests, "This system is not compatible right now.");
+    printTestSummary(screen, testList, tests, "This system is not compatible right now.");
 
-    list.on("select", function (data) {
+    testList.on("select", function (data) {
         if (data.content === "1.  Exit") require("./welcomeScreen")(screen);
     });
 };

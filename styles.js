@@ -1,4 +1,4 @@
-const packagejson = require("./package.json")
+const { version } = require('./package.json');
 
 module.exports = {
     list: {
@@ -24,7 +24,7 @@ module.exports = {
         align: "center",
         top: "8%",
         width: '100%',
-        content: `HurricaneElectricAutoIPv6TunnelCreator (HEAT) version ${packagejson.version} :D`,
+        content: `HurricaneElectricAutoIPv6TunnelCreator (HEAT) version ${version} :D`,
     },
     tipText: {
         align: "center",
