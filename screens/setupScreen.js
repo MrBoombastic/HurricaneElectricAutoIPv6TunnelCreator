@@ -16,6 +16,10 @@ module.exports = async (screen) => {
     setupList.focus();
     screen.append(setupList);
 
+    setupList.on("select", function (data) {
+        if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
+    });
+
     //WELCOME TO CALLBACK HELL
     //BECAUSE SOMEHOW ASYNC/AWAIT DOESN'T WORK
 
@@ -77,9 +81,5 @@ module.exports = async (screen) => {
                 });
             });
         });
-    });
-
-    setupList.on("select", function (data) {
-        if (data.content === "1.  Exit") require("./welcomeScreen")(screen);
     });
 };

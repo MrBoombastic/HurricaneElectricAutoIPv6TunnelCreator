@@ -1,0 +1,6 @@
+{
+  "ClientIPv6Address": "1111::",
+  "ServerIPv4Address": "1.1.1.1",
+  "ServerIPv6Address": "1111::",
+  "Routed": "1111::/64"
+}

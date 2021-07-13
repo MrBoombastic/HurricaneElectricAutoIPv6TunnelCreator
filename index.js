@@ -1,7 +1,7 @@
 //Boilerplate
 const name = "HurricaneElectricAutoIPv6TunnelCreator",
-    blessed = require('blessed'),
-    screen = blessed.screen({
+    {screen} = require('blessed'),
+    programScreen = screen({
         smartCSR: true,
         title: name
     });
@@ -9,9 +9,9 @@ const name = "HurricaneElectricAutoIPv6TunnelCreator",
 process.name = name;
 
 //Render GUI
-require("./screens/welcomeScreen")(screen);
+require("./screens/welcomeScreen")(programScreen);
 
 //Adding cancel keys
-screen.key(['escape', 'q', 'C-c'], function () {
+programScreen.key(['escape', 'q', 'C-c'], function () {
     return process.exit(0);
 });

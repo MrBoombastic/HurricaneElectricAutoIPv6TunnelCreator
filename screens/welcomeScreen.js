@@ -11,7 +11,7 @@ module.exports = (screen) => {
     welcomeList.addItem("2.  Set up HE IPv6 tunnel using answer file.");
     welcomeList.addItem("3.  Test system for IPv6 connection.");
     welcomeList.addItem("4.  Check for updates.")
-    welcomeList.addItem("5.  RickRoll yourself.");
+    welcomeList.addItem("5.  If you have got too much RAM, you can use this option!");
     welcomeList.addItem("6.  Exit.");
     screen.append(text);
     screen.append(tipText);
@@ -30,6 +30,8 @@ module.exports = (screen) => {
                 return await require("./testConnectionScreen")(screen);
             case 4:
                 return await require("./updateScreen")(screen)
+            case 5:
+                return await require("./rickRollScreen")(screen)
             case 6:
                 return process.exit(0);
             default:

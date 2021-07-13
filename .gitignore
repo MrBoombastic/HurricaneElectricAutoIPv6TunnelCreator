@@ -2,6 +2,7 @@
 .idea
 yarn.lock
 HEAT-linux-amd64
+answer.json
 
 # Logs
 logs

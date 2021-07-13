@@ -14,6 +14,11 @@ module.exports = async (screen) => {
         ipCommandPresent = true;
 
     testList.focus();
+
+    testList.on("select", function (data) {
+        if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
+    });
+
     testList.addItem("INFO: testing started...");
     screen.append(testList);
     appendList(screen, testList, `INFO: current system is ${os.version()} ${os.release()} (${os.platform()})`);
@@ -46,7 +51,4 @@ module.exports = async (screen) => {
     //summary
     printTestSummary(screen, testList, tests, "This system is not compatible right now.");
 
-    testList.on("select", function (data) {
-        if (data.content === "1.  Exit") require("./welcomeScreen")(screen);
-    });
 };

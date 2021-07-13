@@ -9,6 +9,10 @@ module.exports = async (screen) => {
     testList.focus();
     screen.append(testList);
 
+    testList.on("select", function (data) {
+        if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
+    });
+
     prompt(styles.prompt(screen)).input('What IPv6 from your assigned block do you want to test?', '', async function (err, IP) {
         //stage1
         IP = validateIP(IP);
@@ -43,9 +47,5 @@ module.exports = async (screen) => {
 
         //summary
         printTestSummary(screen, testList, tests);
-    });
-
-    testList.on("select", function (data) {
-        if (data.content === "1.  Exit") require("./welcomeScreen")(screen);
     });
 };

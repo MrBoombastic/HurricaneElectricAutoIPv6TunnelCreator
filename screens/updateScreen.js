@@ -8,6 +8,10 @@ module.exports = async (screen) => {
     const updateList = list(styles.list);
 
     updateList.focus();
+
+    updateList.on("select", function (data) {
+        if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
+    });
     updateList.addItem("INFO: testing started...");
     screen.append(updateList);
 
@@ -25,7 +29,4 @@ module.exports = async (screen) => {
 
     updateList.select(Infinity);
 
-    updateList.on("select", function (data) {
-        if (data.content === "1.  Exit") require("./welcomeScreen")(screen);
-    });
 };
