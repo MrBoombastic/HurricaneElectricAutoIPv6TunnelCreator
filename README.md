@@ -128,8 +128,10 @@ HEAT has several modes:
 
 - Compatibility check - This mode checks, if system is compatible with this tool.
 - Tunnel setup - This mode asks about various things and then sets up IPv6 tunnel.
-- Tunnel setup using answer file - Like above, but more automatically. You can copy `answer.json` file from this repo, fill it properly and put it next to binary. No questions will be asked.
-- Connection test - Tests, if tunnel has been set up properly. If `answer.json` exists, IP to test from will be suggested.
+- Tunnel setup using answer file - Like above, but more automatically. You can copy `answer.json` file from this repo,
+  fill it properly and put it next to binary. No questions will be asked.
+- Connection test - Tests, if tunnel has been set up properly. If `answer.json` exists, IP to test from will be
+  suggested.
 - Updates check
 - RAM eater - If you have got too much RAM, run this option now!!!
 
@@ -148,7 +150,7 @@ proposed features (and known issues).
 
 ## Contributing
 
-Any contributions make are **greatly appreciated**. 
+Any contributions make are **greatly appreciated**.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -165,6 +167,7 @@ Distributed under the WTFPL License. See `LICENSE.md` for more information.
 <!-- CONTACT -->
 
 ## Contact
+
 Look at my GitHub profile!
 
 <!-- ACKNOWLEDGEMENTS -->
@@ -172,30 +175,26 @@ Look at my GitHub profile!
 ## Disclaimer
 
 * This tool modifies `crontab`. Back it up first!
-* This tool modifies your network configuration. Make sure, that you have alternative ways to access your server, if working remotely.
+* This tool modifies your network configuration. Make sure, that you have alternative ways to access your server, if
+  working remotely.
 * This tool is still in beta. Some features cannot work properly or at all.
 
+[contributors-shield]: https://img.shields.io/github/contributors/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator.svg?style=for-the-badge
 
-[contributors-shield]: https://img.shields.io/github/contributors/MrBoombastic/repo.svg?style=for-the-badge
+[contributors-url]: https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator/graphs/contributors
 
-[contributors-url]: https://github.com/MrBoombastic/repo/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator.svg?style=for-the-badge
 
-[forks-shield]: https://img.shields.io/github/forks/MrBoombastic/repo.svg?style=for-the-badge
+[forks-url]: https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator/network/members
 
-[forks-url]: https://github.com/MrBoombastic/repo/network/members
+[stars-shield]: https://img.shields.io/github/stars/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator.svg?style=for-the-badge
 
-[stars-shield]: https://img.shields.io/github/stars/MrBoombastic/repo.svg?style=for-the-badge
+[stars-url]: https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator/stargazers
 
-[stars-url]: https://github.com/MrBoombastic/repo/stargazers
+[issues-shield]: https://img.shields.io/github/issues/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator.svg?style=for-the-badge
 
-[issues-shield]: https://img.shields.io/github/issues/MrBoombastic/repo.svg?style=for-the-badge
+[issues-url]: https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator/issues
 
-[issues-url]: https://github.com/MrBoombastic/repo/issues
+[license-shield]: https://img.shields.io/github/license/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator.svg?style=for-the-badge
 
-[license-shield]: https://img.shields.io/github/license/MrBoombastic/repo.svg?style=for-the-badge
-
-[license-url]: https://github.com/MrBoombastic/repo/blob/master/LICENSE.txt
-
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-
-[linkedin-url]: https://linkedin.com/in/MrBoombastic
+[license-url]: https://github.com/MrBoombastic/repo/blob/master/LICENSE.md
