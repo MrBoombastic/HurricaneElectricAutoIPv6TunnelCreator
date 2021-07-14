@@ -1,7 +1,7 @@
 const got = require("got"),
     {spawn} = require('child_process'),
-    fs = require("fs");
-ipv6 = require("ip6addr");
+    fs = require("fs"),
+    ipv6 = require("ip6addr");
 
 module.exports = {
     appendList: (screen, list, text) => {

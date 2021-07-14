@@ -40,10 +40,10 @@ module.exports = async (screen) => {
         const reqIpify = await request6(IP, "https://api64.ipify.org/?format=json");
         if (reqIpify.statusCode === 200) {
             retrievedIP = JSON.parse(reqIpify.body).ip;
-            appendList(screen, testList, `RESPONSE: ${retrievedIP} - PASSED!`);
+            appendList(screen, testList, `RESPONSE: ${retrievedIP} - PASSED`);
             tests.passed++;
         } else {
-            appendList(screen, testList, `RESPONSE: not OK (${reqIpify?.statusText || reqIpify?.code || JSON.stringify(reqIpify)}) - FAILED!`);
+            appendList(screen, testList, `RESPONSE: not OK (${reqIpify?.statusText || reqIpify?.code || JSON.stringify(reqIpify)}) - FAILED`);
             return printTestSummary(screen, testList, tests);
         }
 
@@ -52,10 +52,10 @@ module.exports = async (screen) => {
         appendList(screen, testList, `TEST: sending request to Google`);
         const reqGoogle = await request6(IP, "https://google.com");
         if (reqGoogle.statusCode === 200) {
-            appendList(screen, testList, `RESPONSE: OK - PASSED!`);
+            appendList(screen, testList, `RESPONSE: OK - PASSED`);
             tests.passed++;
         } else {
-            appendList(screen, testList, `RESPONSE: not OK (${reqGoogle?.statusText || reqGoogle?.code || JSON.stringify(reqGoogle)}) - FAILED!`);
+            appendList(screen, testList, `RESPONSE: not OK (${reqGoogle?.statusText || reqGoogle?.code || JSON.stringify(reqGoogle)}) - FAILED`);
             return printTestSummary(screen, testList, tests);
         }
 
@@ -63,10 +63,10 @@ module.exports = async (screen) => {
         appendList(screen, testList, `TEST: sending request to Facebook`);
         const reqFB = await request6(IP, "https://facebook.com");
         if (reqGoogle.statusCode === 200) {
-            appendList(screen, testList, `RESPONSE: OK - PASSED!`);
+            appendList(screen, testList, `RESPONSE: OK - PASSED`);
             tests.passed++;
         } else {
-            appendList(screen, testList, `RESPONSE: not OK (${reqFB?.statusText || reqFB?.code || JSON.stringify(reqFB)}) - FAILED!`);
+            appendList(screen, testList, `RESPONSE: not OK (${reqFB?.statusText || reqFB?.code || JSON.stringify(reqFB)}) - FAILED`);
             return printTestSummary(screen, testList, tests);
         }
 
