@@ -20,7 +20,7 @@
 <h3 align="center">HEAT</h3>
 
   <p align="center">
-    The mini tool that helps you set up a new IPv6 tunnel from HurricaneElectric.
+    The mini tool that helps you set up a new IPv6 tunnel from Hurricane Electric.
     <br />
     <a href="https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator"></a>
     <br />
