@@ -45,7 +45,6 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -197,4 +196,4 @@ Look at my GitHub profile!
 
 [license-shield]: https://img.shields.io/github/license/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator.svg?style=for-the-badge
 
-[license-url]: https://github.com/MrBoombastic/repo/blob/master/LICENSE.md
+[license-url]: https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator/blob/master/LICENSE.md
