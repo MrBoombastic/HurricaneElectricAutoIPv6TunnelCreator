@@ -163,13 +163,15 @@ Any contributions make are **greatly appreciated**.
 
 Distributed under the WTFPL License. See `LICENSE.md` for more information.
 
+App's icon <a target="_blank" href="https://icons8.com/icon/pvsTkfYCFuf7/hot-springs">Hot Springs</a> created
+by <a target="_blank" href="https://icons8.com">Icons8</a>.
+
+
 <!-- CONTACT -->
 
 ## Contact
 
 Look at my GitHub profile!
-
-<!-- ACKNOWLEDGEMENTS -->
 
 ## Disclaimer
 
