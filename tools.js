@@ -1,5 +1,8 @@
 const got = require("got"),
+    {box} = require('blessed'),
+    styles = require("./styles.js"),
     {spawn} = require('child_process'),
+    isElevated = require('is-elevated'),
     fs = require("fs"),
     ipv6 = require("ip6addr");
 
@@ -7,6 +10,19 @@ module.exports = {
     appendList: (screen, list, text) => {
         list.addItem(text);
         screen.render();
+    },
+    checkElevated: async (screen) => {
+        if (!await isElevated()) {
+            const errorBox = box(styles.sudoErrorText);
+            screen.append(errorBox);
+            screen.render();
+            setTimeout(() => {
+                screen.remove(errorBox);
+                screen.render();
+            }, 2000);
+            return false;
+        }
+        return true;
     },
     printTestSummary: (screen, list, tests, failReason = "") => {
         module.exports.appendList(screen, list, "");

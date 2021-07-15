@@ -1,6 +1,6 @@
 const styles = require("../styles"),
     fs = require("fs"),
-    {appendList, validateIP, failSetup, request4, interfacesCreator, IPv6Enabler} = require("../tools"),
+    {appendList, validateIP, failSetup, request4, interfacesCreator, IPv6Enabler, checkElevated} = require("../tools"),
     {list} = require('blessed'),
     data = {
         address: null,
@@ -13,7 +13,7 @@ const styles = require("../styles"),
     };
 
 module.exports = async (screen) => {
-
+    if (!await checkElevated(screen)) return;
     const setupList = list(styles.list);
 
     setupList.on("select", function (data) {

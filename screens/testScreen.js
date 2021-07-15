@@ -8,10 +8,11 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const testList = list(styles.list),
-        tests = {count: 3, passed: 3};
+        tests = {count: 4, passed: 4};
     let interfacesFilePresent = true,
         sysctlFilePresent = true,
-        ipCommandPresent = true;
+        ipCommandPresent = true,
+        sudoCommandPresent = true;
 
     testList.focus();
 
@@ -48,6 +49,13 @@ module.exports = async (screen) => {
     });
     appendList(screen, testList, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
 
+    //stage 4
+    //stage 3
+    await commandExists("sudo").catch(() => {
+        sudoCommandPresent = false;
+        tests.passed--;
+    });
+    appendList(screen, testList, `CHECK: checking sudo command presence: ${sudoCommandPresent ? "PASSED" : "FAILED"}`);
     //summary
     printTestSummary(screen, testList, tests, "This system is not compatible right now.");
 

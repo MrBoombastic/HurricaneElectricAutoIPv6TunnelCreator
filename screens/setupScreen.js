@@ -1,5 +1,5 @@
 const styles = require("../styles"),
-    {appendList, validateIP, failSetup, request4, interfacesCreator, IPv6Enabler} = require("../tools"),
+    {appendList, validateIP, failSetup, request4, interfacesCreator, IPv6Enabler, checkElevated} = require("../tools"),
     {list, prompt} = require('blessed'),
     data = {
         address: null,
@@ -12,6 +12,7 @@ const styles = require("../styles"),
     };
 
 module.exports = async (screen) => {
+    if (!await checkElevated(screen)) return;
     const setupList = list(styles.list);
     setupList.focus();
     screen.append(setupList);
@@ -60,15 +61,15 @@ module.exports = async (screen) => {
                 //STAGE 5 - LAST ONE!!!
                 stageText = "Routed /64 or /48 Prefix";
                 prompt(styles.prompt(screen)).input(`Enter ${stageText} (with /64 or /48 at the end)`, '', async function (err, routed) {
-                    const split = routed?.split("/")
+                    const split = routed?.split("/");
                     if (!validateIP(split?.[0]) || !split?.[1]) return failSetup(screen, setupList, `${stageText} is not valid!`);
                     appendList(screen, setupList, `INFO: ${stageText} is ${routed}`);
                     data.routed = routed;
 
-                    data.netmask = split[1]
+                    data.netmask = split[1];
                     appendList(screen, setupList, `INFO: Detected Netmask is ${data.netmask}`);
 
-                    await interfacesCreator(screen, setupList, data)
+                    await interfacesCreator(screen, setupList, data);
                     appendList(screen, setupList, `INFO: file overwritten. Enabling IPv6 in the system...`);
 
                     IPv6Enabler(screen, setupList, data);

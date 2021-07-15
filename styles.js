@@ -1,4 +1,4 @@
-const { version } = require('./package.json');
+const {version} = require('./package.json');
 
 module.exports = {
     list: {
@@ -25,6 +25,16 @@ module.exports = {
         top: "8%",
         width: '100%',
         content: `HurricaneElectricAutoIPv6TunnelCreator (HEAT) version ${version} :D`,
+    },
+    sudoErrorText: {
+        align: "center",
+        top: "97%",
+        width: "100%",
+        content: "ERROR: This option needs sudo permissions!",
+        style: {
+            fg: 'white',
+            bg: '#ff0000',
+        }
     },
     tipText: {
         align: "center",

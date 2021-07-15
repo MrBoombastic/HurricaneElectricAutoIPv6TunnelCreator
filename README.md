@@ -79,8 +79,8 @@ easy to access via pseudo-GUI. It feels like GRUB, but for IPv6. Haha.
 ## Compatibility
 
 This tool is compatible only with systems using `/etc/network/interfaces` file. That means that perhaps only Debian is
-compatible right now. As far as I know, Ubuntu is using `netplan`, so HEAT can't work there (despite that Ubuntu is
-Debian based).
+compatible right now. As far as I know, Ubuntu is using `netplan`, so HEAT can't work there (despite the fact that
+Ubuntu is Debian based).
 
 ## Getting Started
 
@@ -178,7 +178,7 @@ Look at my GitHub profile!
 * This tool modifies `crontab`. Back it up first!
 * This tool modifies your network configuration. Make sure, that you have alternative ways to access your server, if
   working remotely.
-* This tool is still in beta. Some features cannot work properly or at all.
+* This tool is still in beta. Some features may not work properly or at all.
 
 [contributors-shield]: https://img.shields.io/github/contributors/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator.svg?style=for-the-badge
 
