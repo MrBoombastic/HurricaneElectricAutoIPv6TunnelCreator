@@ -24,6 +24,18 @@ module.exports = {
         }
         return true;
     },
+    checkDistroName: new Promise((resolve, reject) => {
+        const distroName = spawn(`grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"'`, {shell: true});
+        distroName.stdout.on('data', data => {
+            resolve(data.toString().replace(/\n/g, " ").replaceAll(" ", ""));
+        });
+        distroName.stderr.on('data', () => {
+            reject(false);
+        });
+    }),
+    checkCompatibilityByDistroName: async (distro = module.exports.checkDistroName) => {
+        return !!["arch", "manjaro", "debian"].includes(await distro);
+    },
     printTestSummary: (screen, list, tests, failReason = "") => {
         module.exports.appendList(screen, list, "");
         module.exports.appendList(screen, list, `INFO: All tests done. Passed ${tests.passed} of total ${tests.count} tests.`);
@@ -62,7 +74,7 @@ module.exports = {
         //Select exit button
         list.select(Infinity);
     },
-    IPv6Enabler: (screen, list, data) => {
+    IPv6Enabler: (screen, list, data, device = "lo") => { //debian & arch
         spawn('sudo sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
             .stderr.on('data', () => {
             return module.exports.appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" manually.`);
@@ -71,7 +83,7 @@ module.exports = {
             .stderr.on('data', () => {
             return module.exports.appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
         });
-        spawn(`sudo ip -6 route replace local ${data.routed} dev lo`, {shell: true})
+        spawn(`sudo ip -6 route replace local ${data.routed} dev ${device}`, {shell: true})
             .stderr.on('data', () => {
             return module.exports.appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev lo' manually.`);
         });
@@ -80,7 +92,7 @@ module.exports = {
             return module.exports.appendList(screen, list, `ERROR: failed to add '@reboot ip -6 route replace local ${data.routed} dev lo' to cron.`);
         });
     },
-    interfacesCreator: async (screen, list, data) => {
+    interfacesCreator: async (screen, list, data) => { //currently debian only
         module.exports.appendList(screen, list, `INFO: generating new 'interfaces' file...`);
         let interfaces = await fs.readFileSync("/etc/network/interfaces", "UTF-8");
         interfaces += `
@@ -104,5 +116,43 @@ iface he-ipv6 inet6 v4tunnel
         await fs.copyFileSync("/etc/network/interfaces", `/etc/network/${backupFilename}`);
         module.exports.appendList(screen, list, `INFO: trying to overwrite current 'interfaces' file...`);
         await fs.writeFileSync("/etc/network/interfaces", interfaces);
+    },
+    serviceManager: (name, activity) => {
+        return new Promise((resolve, reject) => {
+            const service = spawn(`sudo systemctl ${activity} ${name}`, {shell: true});
+            service.stdout.on('data', () => {
+                resolve();
+            });
+            service.stderr.on('data', () => {
+                reject(false);
+            });
+        });
+    },
+    serviceCreator: async (screen, list, data) => {
+        module.exports.appendList(screen, list, `INFO: generating new 'interfaces' file...`);
+        let service = await fs.readFileSync("/etc/network/interfaces", "UTF-8");
+        service += `
+[Unit]
+Description=HurricaneElectric Tunnel (HEAT)
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/ip tunnel add he-ipv6 mode sit remote ${data.endpoint} local ${data.local} ttl 255
+ExecStart=/usr/bin/ip link set he-ipv6 up mtu 1480
+ExecStart=/usr/bin/ip addr add ${data.address + "/64"} dev he-ipv6
+ExecStart=/usr/bin/ip -6 route add ::/0 dev he-ipv6
+ExecStop=/usr/bin/ip -6 route del ::/0 dev he-ipv6
+ExecStop=/usr/bin/ip link set he-ipv6 down
+ExecStop=/usr/bin/ip tunnel del he-ipv6
+
+[Install]
+WantedBy=multi-user.target
+`;
+        await fs.writeFileSync("./service.new", service);
+        module.exports.appendList(screen, list, `INFO: new 'service' file generated`);
+        module.exports.appendList(screen, list, `INFO: trying to add new service 'heheat'...`);
+        await fs.writeFileSync("/etc/systemd/system/he-heat.service", service);
     }
 };

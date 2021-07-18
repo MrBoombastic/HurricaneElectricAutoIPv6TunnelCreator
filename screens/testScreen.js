@@ -1,5 +1,5 @@
 const styles = require("../styles"),
-    {appendList, printTestSummary} = require("../tools"),
+    {appendList, printTestSummary, checkDistroName, checkCompatibilityByDistroName} = require("../tools"),
     fs = require("fs"),
     os = require("os"),
     commandExists = require('command-exists'),
@@ -22,7 +22,10 @@ module.exports = async (screen) => {
 
     testList.addItem("INFO: testing started...");
     screen.append(testList);
-    appendList(screen, testList, `INFO: current system is ${os.version()} ${os.release()} (${os.platform()})`);
+    appendList(screen, testList, `INFO: current system is ${os.release()} (${os.platform()})`);
+
+    appendList(screen, testList, `IMPORTANT_CHECK: distribution name is ${await checkDistroName}: ${await checkCompatibilityByDistroName() ? "PASSED" : "FAILED"}`);
+
 
     //stage 1
     try {
@@ -57,6 +60,6 @@ module.exports = async (screen) => {
     });
     appendList(screen, testList, `CHECK: checking sudo command presence: ${sudoCommandPresent ? "PASSED" : "FAILED"}`);
     //summary
-    printTestSummary(screen, testList, tests, "This system is not compatible right now.");
+    printTestSummary(screen, testList, tests, "Not all tests passed, but that's OK. Only 'IMPORTANT_CHECK' matters here.");
 
 };
