@@ -124,12 +124,10 @@ iface he-ipv6 inet6 v4tunnel
     serviceManager: (name, activity) => {
         return new Promise((resolve, reject) => {
             const service = spawn(`sudo systemctl ${activity} ${name}`, {shell: true});
-            service.stdout.on('data', () => {
-                return resolve();
-            });
             service.stderr.on('data', () => {
-                return reject();
+                return reject(false);
             });
+            return resolve(true);
         });
     },
     serviceCreator: async (screen, list, data) => {
@@ -157,12 +155,16 @@ WantedBy=multi-user.target
         await fs.writeFileSync("./service.new", service);
         module.exports.appendList(screen, list, `INFO: new 'service' file generated`);
         module.exports.appendList(screen, list, `INFO: adding new service 'he-heat'...`);
-        await fs.writeFileSync("/etc/systemd/system/he-heat.service", service);
+        fs.copyFile('./service.new', '/etc/systemd/system/he-heat.service', (err) => {
+            if (err) return module.exports.appendList(screen, list, "ERROR: couldn't add service he-heat to systemd");
+        });
+        module.exports.appendList(screen, list, "INFO: service added, restarting systemctl daemon...");
         spawn(`sudo systemctl daemon-reload`, {shell: true}).stderr.on('data', () => {
             return module.exports.appendList(screen, list, `ERROR: failed to reload systemctl daemon!`);
         });
-        const serviceStart = await module.exports.serviceManager("he-heat", "start").catch(() => false);
-        module.exports.appendList(screen, list, `INFO: service ${serviceStart ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
+        module.exports.appendList(screen, list, "INFO: daemon restarted! Starting service...");
+        const serviceStart = await module.exports.serviceManager("he-heat", "start").catch(e => e);
+        module.exports.appendList(screen, list, serviceStart ? "INFO: service started successfully" : "ERROR: service failed! Run 'sudo systemctl status he-ipv6' to know more.");
 
     },
     setup: async (screen, list, data) => {
