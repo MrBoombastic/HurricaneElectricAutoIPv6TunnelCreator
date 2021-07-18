@@ -74,23 +74,27 @@ module.exports = {
         //Select exit button
         list.select(Infinity);
     },
-    IPv6Enabler: (screen, list, data, device = "lo") => { //debian & arch
-        spawn('sudo sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
-            .stderr.on('data', () => {
-            return module.exports.appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" manually.`);
-        });
-        spawn("sudo echo 'net.ipv6.ip_nonlocal_bind = 1' >> /etc/sysctl.conf", {shell: true})
-            .stderr.on('data', () => {
-            return module.exports.appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
-        });
-        spawn(`sudo ip -6 route replace local ${data.routed} dev ${device}`, {shell: true})
-            .stderr.on('data', () => {
-            return module.exports.appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev ${device}' manually.`);
-        });
-        spawn(`(sudo crontab -l 2>/dev/null | grep -v '^[a-zA-Z]'; echo "@reboot sudo ip -6 route replace local ${data.routed} dev lo") | sort - | uniq - | sudo crontab -`, {shell: true})
-            .stderr.on('data', () => {
-            return module.exports.appendList(screen, list, `ERROR: failed to add '@reboot ip -6 route replace local ${data.routed} dev lo' to cron.`);
-        });
+    IPv6Enabler: (screen, list, data, device = "lo", sysctl = true, ip = true) => { //debian & arch
+        if (sysctl) {
+            spawn('sudo sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
+                .stderr.on('data', () => {
+                return module.exports.appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" manually.`);
+            });
+            spawn("sudo echo 'net.ipv6.ip_nonlocal_bind = 1' >> /etc/sysctl.conf", {shell: true})
+                .stderr.on('data', () => {
+                return module.exports.appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
+            });
+        }
+        if (ip) {
+            spawn(`sudo ip -6 route replace local ${data.routed} dev ${device}`, {shell: true})
+                .stderr.on('data', () => {
+                return module.exports.appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev ${device}' manually.`);
+            });
+            spawn(`(sudo crontab -l 2>/dev/null | grep -v '^[a-zA-Z]'; echo "@reboot sudo ip -6 route replace local ${data.routed} dev lo") | sort - | uniq - | sudo crontab -`, {shell: true})
+                .stderr.on('data', () => {
+                return module.exports.appendList(screen, list, `ERROR: failed to add '@reboot ip -6 route replace local ${data.routed} dev lo' to cron.`);
+            });
+        }
     },
     interfacesCreator: async (screen, list, data) => { //currently debian only
         module.exports.appendList(screen, list, `INFO: generating new 'interfaces' file...`);
@@ -142,6 +146,7 @@ ExecStart=/usr/bin/ip tunnel add he-ipv6 mode sit remote ${data.endpoint} local 
 ExecStart=/usr/bin/ip link set he-ipv6 up mtu 1480
 ExecStart=/usr/bin/ip addr add ${data.address + "/64"} dev he-ipv6
 ExecStart=/usr/bin/ip -6 route add ::/0 dev he-ipv6
+ExecStart=/usr/bin/ip -6 route replace local ${data.routed} dev he-ipv6
 ExecStop=/usr/bin/ip -6 route del ::/0 dev he-ipv6
 ExecStop=/usr/bin/ip link set he-ipv6 down
 ExecStop=/usr/bin/ip tunnel del he-ipv6
@@ -167,7 +172,7 @@ WantedBy=multi-user.target
             case 'arch' || 'manjaro':
                 await module.exports.serviceCreator(screen, list, data);
                 module.exports.appendList(screen, list, `INFO: enabling IPv6 in the system...`);
-                module.exports.IPv6Enabler(screen, list, data, "he-ipv6");
+                module.exports.IPv6Enabler(screen, list, data, "he-ipv6", true, false);
                 module.exports.appendList(screen, list, `INFO: IPv6 enabled in the system, trying to start 'he-heat' service...`);
                 break;
         }
