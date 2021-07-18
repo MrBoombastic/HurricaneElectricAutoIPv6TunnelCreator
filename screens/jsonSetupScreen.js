@@ -1,6 +1,6 @@
 const styles = require("../styles"),
     fs = require("fs"),
-    {appendList, validateIP, failSetup, request4, interfacesCreator, IPv6Enabler, checkElevated} = require("../tools"),
+    {appendList, validateIP, failSetup, request4, setup, checkElevated} = require("../tools"),
     {list} = require('blessed'),
     data = {
         address: null,
@@ -73,11 +73,7 @@ module.exports = async (screen) => {
     data.netmask = data.routed.split("/")[1];
     appendList(screen, setupList, `INFO: Detected Netmask is ${data.netmask}`);
 
-    await interfacesCreator(screen, setupList, data);
-    appendList(screen, setupList, `INFO: file overwritten. Enabling IPv6 in the system...`);
-
-    IPv6Enabler(screen, setupList, data);
-    appendList(screen, setupList, `INFO: new configuration saved and enabled successfully! Reboot now!`);
+    await setup(screen, setupList, data);
 
     //Finish
     appendList(screen, setupList, ``);

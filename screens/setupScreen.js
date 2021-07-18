@@ -1,16 +1,5 @@
 const styles = require("../styles"),
-    {
-        appendList,
-        validateIP,
-        failSetup,
-        request4,
-        interfacesCreator,
-        IPv6Enabler,
-        checkElevated,
-        checkDistroName,
-        serviceCreator,
-        serviceManager
-    } = require("../tools"),
+    {appendList, validateIP, failSetup, request4, checkElevated, setup} = require("../tools"),
     {list, prompt} = require('blessed'),
     data = {
         address: null,
@@ -80,22 +69,7 @@ module.exports = async (screen) => {
                     data.netmask = split[1];
                     appendList(screen, setupList, `INFO: Detected Netmask is ${data.netmask}`);
 
-
-                    switch (await checkDistroName) {
-                        case 'debian':
-                            await interfacesCreator(screen, setupList, data);
-                            appendList(screen, setupList, `INFO: 'interfaces' file overwritten. Enabling IPv6 in the system...`);
-                            IPv6Enabler(screen, setupList, data);
-                            appendList(screen, setupList, `INFO: new configuration saved and enabled successfully! Reboot now!`);
-                            break;
-                        case 'arch' || 'manjaro':
-                            await serviceCreator(screen, setupList, data);
-                            appendList(screen, setupList, `INFO: 'he-heat' service created. Enabling IPv6 in the system...`);
-                            IPv6Enabler(screen, setupList, data, "he-ipv6");
-                            appendList(screen, setupList, `INFO: IPv6 enabled in the system, trying to start 'he-heat' service...`);
-                            appendList(screen, setupList, `INFO: service ${await serviceManager("he-heat", "start") ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
-                            break;
-                    }
+                    await setup(screen, setupList, data);
 
                     //Finish
                     appendList(screen, setupList, ``);

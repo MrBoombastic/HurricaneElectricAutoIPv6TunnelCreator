@@ -8,9 +8,10 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const testList = list(styles.list),
-        tests = {count: 4, passed: 4};
+        tests = {count: 5, passed: 5};
     let interfacesFilePresent = true,
         sysctlFilePresent = true,
+        crontabCommandPresent = true,
         ipCommandPresent = true,
         sudoCommandPresent = true;
 
@@ -53,13 +54,19 @@ module.exports = async (screen) => {
     appendList(screen, testList, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
 
     //stage 4
-    //stage 3
+    await commandExists("crontab").catch(() => {
+        crontabCommandPresent = false;
+        tests.passed--;
+    });
+    appendList(screen, testList, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
+
+    //stage 5
     await commandExists("sudo").catch(() => {
         sudoCommandPresent = false;
         tests.passed--;
     });
-    appendList(screen, testList, `CHECK: checking sudo command presence: ${sudoCommandPresent ? "PASSED" : "FAILED"}`);
+    appendList(screen, testList, `CHECK: checking sudo command presence: ${crontabCommandPresent ? "PASSED" : "FAILED"}`);
     //summary
-    printTestSummary(screen, testList, tests, "Not all tests passed, but that's OK. Only 'IMPORTANT_CHECK' matters here.");
+    printTestSummary(screen, testList, tests, "Not all tests passed, but that's OK. Read documentation.");
 
 };

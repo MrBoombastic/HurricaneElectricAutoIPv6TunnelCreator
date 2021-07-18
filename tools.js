@@ -130,8 +130,7 @@ iface he-ipv6 inet6 v4tunnel
     },
     serviceCreator: async (screen, list, data) => {
         module.exports.appendList(screen, list, `INFO: generating new 'interfaces' file...`);
-        let service = await fs.readFileSync("/etc/network/interfaces", "UTF-8");
-        service += `
+        const service = `
 [Unit]
 Description=HurricaneElectric Tunnel (HEAT)
 After=network.target
@@ -152,7 +151,24 @@ WantedBy=multi-user.target
 `;
         await fs.writeFileSync("./service.new", service);
         module.exports.appendList(screen, list, `INFO: new 'service' file generated`);
-        module.exports.appendList(screen, list, `INFO: trying to add new service 'heheat'...`);
+        module.exports.appendList(screen, list, `INFO: adding new service 'he-heat'...`);
         await fs.writeFileSync("/etc/systemd/system/he-heat.service", service);
+    },
+    setup: async (screen, setupList, data) => {
+        switch (await module.exports.checkDistroName) {
+            case 'debian':
+                await module.exports.interfacesCreator(screen, setupList, data);
+                module.exports.appendList(screen, setupList, `INFO: 'interfaces' file overwritten. Enabling IPv6 in the system...`);
+                module.exports.IPv6Enabler(screen, setupList, data);
+                module.exports.appendList(screen, setupList, `INFO: new configuration saved and enabled successfully! Reboot now!`);
+                break;
+            case 'arch' || 'manjaro':
+                await module.exports.serviceCreator(screen, setupList, data);
+                module.exports.appendList(screen, setupList, `INFO: 'he-heat' service created. Enabling IPv6 in the system...`);
+                module.exports.IPv6Enabler(screen, setupList, data, "he-ipv6");
+                module.exports. appendList(screen, setupList, `INFO: IPv6 enabled in the system, trying to start 'he-heat' service...`);
+                module.exports.appendList(screen, setupList, `INFO: service ${await module.exports.serviceManager("he-heat", "start") ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
+                break;
+        }
     }
 };
