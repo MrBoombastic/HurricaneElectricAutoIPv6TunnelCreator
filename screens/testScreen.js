@@ -58,7 +58,7 @@ module.exports = async (screen) => {
         crontabCommandPresent = false;
         tests.passed--;
     });
-    appendList(screen, testList, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
+    appendList(screen, testList, `CHECK: checking crontab command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
 
     //stage 5
     await commandExists("sudo").catch(() => {

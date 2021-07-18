@@ -125,10 +125,10 @@ iface he-ipv6 inet6 v4tunnel
         return new Promise((resolve, reject) => {
             const service = spawn(`sudo systemctl ${activity} ${name}`, {shell: true});
             service.stdout.on('data', () => {
-                resolve();
+                return resolve();
             });
             service.stderr.on('data', () => {
-                reject(false);
+                return reject();
             });
         });
     },
@@ -158,7 +158,7 @@ WantedBy=multi-user.target
         module.exports.appendList(screen, list, `INFO: new 'service' file generated`);
         module.exports.appendList(screen, list, `INFO: adding new service 'he-heat'...`);
         await fs.writeFileSync("/etc/systemd/system/he-heat.service", service);
-        module.exports.appendList(screen, list, `INFO: service ${await module.exports.serviceManager("he-heat", "start") ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
+        module.exports.appendList(screen, list, `INFO: service ${await module.exports.serviceManager("he-heat", "start").catch(() => false) ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
 
     },
     setup: async (screen, list, data) => {
