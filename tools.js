@@ -158,7 +158,14 @@ WantedBy=multi-user.target
         module.exports.appendList(screen, list, `INFO: new 'service' file generated`);
         module.exports.appendList(screen, list, `INFO: adding new service 'he-heat'...`);
         await fs.writeFileSync("/etc/systemd/system/he-heat.service", service);
-        module.exports.appendList(screen, list, `INFO: service ${await module.exports.serviceManager("he-heat", "start").catch(() => false) ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
+        const reload = spawn(`sudo systemctl daemon-reload`, {shell: true});
+        reload.stderr.on('data', () => {
+            return module.exports.appendList(screen, list, `ERROR: failed to reload systemctl daemon!`);
+        });
+        reload.stdout.on('data', async () => {
+            const service = await module.exports.serviceManager("he-heat", "start").catch(() => false);
+            module.exports.appendList(screen, list, `INFO: service ${service ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
+        });
 
     },
     setup: async (screen, list, data) => {
