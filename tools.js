@@ -153,21 +153,22 @@ WantedBy=multi-user.target
         module.exports.appendList(screen, list, `INFO: new 'service' file generated`);
         module.exports.appendList(screen, list, `INFO: adding new service 'he-heat'...`);
         await fs.writeFileSync("/etc/systemd/system/he-heat.service", service);
+        module.exports.appendList(screen, list, `INFO: service ${await module.exports.serviceManager("he-heat", "start") ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
+
     },
-    setup: async (screen, setupList, data) => {
+    setup: async (screen, list, data) => {
         switch (await module.exports.checkDistroName) {
             case 'debian':
-                await module.exports.interfacesCreator(screen, setupList, data);
-                module.exports.appendList(screen, setupList, `INFO: 'interfaces' file overwritten. Enabling IPv6 in the system...`);
-                module.exports.IPv6Enabler(screen, setupList, data);
-                module.exports.appendList(screen, setupList, `INFO: new configuration saved and enabled successfully! Reboot now!`);
+                await module.exports.interfacesCreator(screen, list, data);
+                module.exports.appendList(screen, list, `INFO: 'interfaces' file overwritten. Enabling IPv6 in the system...`);
+                module.exports.IPv6Enabler(screen, list, data);
+                module.exports.appendList(screen, list, `INFO: new configuration saved and enabled successfully! Reboot now!`);
                 break;
             case 'arch' || 'manjaro':
-                await module.exports.serviceCreator(screen, setupList, data);
-                module.exports.appendList(screen, setupList, `INFO: service ${await module.exports.serviceManager("he-heat", "start") ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
-                module.exports.appendList(screen, setupList, `INFO: enabling IPv6 in the system...`);
-                module.exports.IPv6Enabler(screen, setupList, data, "he-ipv6");
-                module.exports.appendList(screen, setupList, `INFO: IPv6 enabled in the system, trying to start 'he-heat' service...`);
+                await module.exports.serviceCreator(screen, list, data);
+                module.exports.appendList(screen, list, `INFO: enabling IPv6 in the system...`);
+                module.exports.IPv6Enabler(screen, list, data, "he-ipv6");
+                module.exports.appendList(screen, list, `INFO: IPv6 enabled in the system, trying to start 'he-heat' service...`);
                 break;
         }
     }
