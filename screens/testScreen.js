@@ -9,7 +9,7 @@ const styles = require("../styles"),
 module.exports = async (screen) => {
     const testList = list(styles.list),
         tests = {count: 5, passed: 5};
-    let interfacesFilePresent = true,
+    let systemctlCommandPresent = true,
         sysctlFilePresent = true,
         crontabCommandPresent = true,
         ipCommandPresent = true,
@@ -29,13 +29,11 @@ module.exports = async (screen) => {
 
 
     //stage 1
-    try {
-        fs.accessSync("/etc/network/interfaces");
-    } catch (e) {
-        interfacesFilePresent = false;
+    await commandExists("systemctl").catch(() => {
+        systemctlCommandPresent = false;
         tests.passed--;
-    }
-    appendList(screen, testList, `CHECK: checking /etc/network/interfaces file presence and access: ${interfacesFilePresent ? "PASSED" : "FAILED"}`);
+    });
+    appendList(screen, testList, `CHECK: checking ip command presence: ${systemctlCommandPresent ? "PASSED" : "FAILED"}`);
 
     //stage 2
     try {

@@ -74,52 +74,15 @@ module.exports = {
         //Select exit button
         list.select(Infinity);
     },
-    IPv6Enabler: (screen, list, data, device = "lo", sysctl = true, ip = true) => { //debian & arch
-        if (sysctl) {
-            spawn('sudo sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
-                .stderr.on('data', () => {
-                return module.exports.appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" manually.`);
-            });
-            spawn("sudo echo 'net.ipv6.ip_nonlocal_bind = 1' >> /etc/sysctl.conf", {shell: true})
-                .stderr.on('data', () => {
-                return module.exports.appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
-            });
-        }
-        if (ip) {
-            spawn(`sudo ip -6 route replace local ${data.routed} dev ${device}`, {shell: true})
-                .stderr.on('data', () => {
-                return module.exports.appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev ${device}' manually.`);
-            });
-            spawn(`(sudo crontab -l 2>/dev/null | grep -v '^[a-zA-Z]'; echo "@reboot sudo ip -6 route replace local ${data.routed} dev lo") | sort - | uniq - | sudo crontab -`, {shell: true})
-                .stderr.on('data', () => {
-                return module.exports.appendList(screen, list, `ERROR: failed to add '@reboot ip -6 route replace local ${data.routed} dev lo' to cron.`);
-            });
-        }
-    },
-    interfacesCreator: async (screen, list, data) => { //currently debian only
-        module.exports.appendList(screen, list, `INFO: generating new 'interfaces' file...`);
-        let interfaces = await fs.readFileSync("/etc/network/interfaces", "UTF-8");
-        interfaces += `
-
-#HEAT-start
-auto he-ipv6
-iface he-ipv6 inet6 v4tunnel
-        address ${data.address}
-        netmask ${data.routed.slice(-2)}
-        endpoint ${data.endpoint}
-        local ${data.local}
-        ttl 255
-        gateway ${data.gateway}
-#HEAT-end
-
-`;
-        await fs.writeFileSync("./interfaces.new", interfaces);
-        module.exports.appendList(screen, list, `INFO: new 'interfaces' file generated`);
-        const backupFilename = `interfaces-${Date.now()}.bak`;
-        module.exports.appendList(screen, list, `INFO: backing up 'interfaces' file (${backupFilename})`);
-        await fs.copyFileSync("/etc/network/interfaces", `/etc/network/${backupFilename}`);
-        module.exports.appendList(screen, list, `INFO: trying to overwrite current 'interfaces' file...`);
-        await fs.writeFileSync("/etc/network/interfaces", interfaces);
+    IPv6Enabler: (screen, list) => {
+        spawn('sudo sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
+            .stderr.on('data', () => {
+            return module.exports.appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" manually.`);
+        });
+        spawn("sudo echo 'net.ipv6.ip_nonlocal_bind = 1' >> /etc/sysctl.conf", {shell: true})
+            .stderr.on('data', () => {
+            return module.exports.appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
+        });
     },
     serviceManager: (name, activity) => {
         return new Promise((resolve, reject) => {
@@ -131,7 +94,7 @@ iface he-ipv6 inet6 v4tunnel
         });
     },
     serviceCreator: async (screen, list, data) => {
-        module.exports.appendList(screen, list, `INFO: generating new 'interfaces' file...`);
+        module.exports.appendList(screen, list, `INFO: generating new service...`);
         const service = `
 [Unit]
 Description=HurricaneElectric Tunnel (HEAT)
@@ -152,10 +115,10 @@ ExecStop=/usr/bin/ip tunnel del he-ipv6
 [Install]
 WantedBy=multi-user.target
 `;
-        await fs.writeFileSync("./service.new", service);
-        module.exports.appendList(screen, list, `INFO: new 'service' file generated`);
+        await fs.writeFileSync("./he-heat.service", service);
+        module.exports.appendList(screen, list, `INFO: new service file generated`);
         module.exports.appendList(screen, list, `INFO: adding new service 'he-heat'...`);
-        fs.copyFile('./service.new', '/etc/systemd/system/he-heat.service', (err) => {
+        fs.copyFile('./he-heat.service', '/etc/systemd/system/he-heat.service', (err) => {
             if (err) return module.exports.appendList(screen, list, "ERROR: couldn't add service he-heat to systemd");
         });
         module.exports.appendList(screen, list, "INFO: service added, restarting systemctl daemon...");
@@ -165,22 +128,22 @@ WantedBy=multi-user.target
         module.exports.appendList(screen, list, "INFO: daemon restarted! Starting service...");
         const serviceStart = await module.exports.serviceManager("he-heat", "start").catch(e => e);
         module.exports.appendList(screen, list, serviceStart ? "INFO: service started successfully" : "ERROR: service failed! Run 'sudo systemctl status he-ipv6' to know more.");
-
+        await module.exports.serviceManager("he-heat", "enable").catch(e => e);
+        module.exports.appendList(screen, list, "Service enabled!");
     },
     setup: async (screen, list, data) => {
+        module.exports.appendList(screen, list, `INFO: setting up...`);
         switch (await module.exports.checkDistroName) {
+            case 'arch':
+            case 'manjaro':
             case 'debian':
-                await module.exports.interfacesCreator(screen, list, data);
-                module.exports.appendList(screen, list, `INFO: 'interfaces' file overwritten. Enabling IPv6 in the system...`);
-                module.exports.IPv6Enabler(screen, list, data);
-                module.exports.appendList(screen, list, `INFO: new configuration saved and enabled successfully! Reboot now!`);
-                break;
-            case 'arch' || 'manjaro':
                 await module.exports.serviceCreator(screen, list, data);
                 module.exports.appendList(screen, list, `INFO: enabling IPv6 in the system...`);
-                module.exports.IPv6Enabler(screen, list, data, "he-ipv6", true, false);
+                module.exports.IPv6Enabler(screen, list);
                 module.exports.appendList(screen, list, `INFO: IPv6 enabled in the system.`);
                 break;
+            default:
+                return module.exports.appendList(screen, list, `ERROR: system not supported!`);
         }
     }
 };

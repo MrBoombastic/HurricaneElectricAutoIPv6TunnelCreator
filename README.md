@@ -41,6 +41,7 @@
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
+<li><a href="#compatibility">Compatibility</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -74,13 +75,19 @@ easy to access via pseudo-GUI. It feels like GRUB, but for IPv6. Haha.
 * [Blessed](https://github.com/chjj/blessed)
 * [pkg](https://github.com/vercel/pkg)
 
-<!-- GETTING STARTED -->
 
 ## Compatibility
 
-This tool is compatible only with systems using `/etc/network/interfaces` file. That means that perhaps only Debian is
-compatible right now. As far as I know, Ubuntu is using `netplan`, so HEAT can't work there (despite the fact that
-Ubuntu is Debian based).
+This tool is compatible only with systems using `systemctl` and `ip` commands. That means, that Debian and Arch are
+supported distros. Manjaro should still work, but I'm not allowing Ubuntu right now.
+
+###Working:
+- Debian
+- Arch
+###Should work:
+- Manjaro
+###Candidates:
+- Ubuntu
 
 ## Getting Started
 
@@ -110,14 +117,12 @@ downloading.
 
 * Node.js v16.4.1
   ```sh
-  nvm install 16.4.1
+  nvm install 16.4.1    #using Node Version Manager here
   ```
 * Yarn (optional, installs dependencies faster than `npm`)
    ```sh
    npm i yarn -g
    ```
-
-<!-- USAGE EXAMPLES -->
 
 ## Usage
 
@@ -137,15 +142,12 @@ HEAT has several modes:
 ![Screenshot](./data/screen2.png)
 
 
-<!-- ROADMAP -->
-
 ## Roadmap
 
 See the [open issues](https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator/issues) for a list of
 proposed features (and known issues).
 
 
-<!-- CONTRIBUTING -->
 
 ## Contributing
 
@@ -157,7 +159,6 @@ Any contributions make are **greatly appreciated**.
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<!-- LICENSE -->
 
 ## License
 
@@ -166,8 +167,6 @@ Distributed under the WTFPL License. See `LICENSE.md` for more information.
 App's icon <a target="_blank" href="https://icons8.com/icon/pvsTkfYCFuf7/hot-springs">Hot Springs</a> created
 by <a target="_blank" href="https://icons8.com">Icons8</a>.
 
-
-<!-- CONTACT -->
 
 ## Contact
 
