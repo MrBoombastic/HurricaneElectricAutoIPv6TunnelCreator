@@ -85,7 +85,7 @@ module.exports = {
         });
         spawn(`sudo ip -6 route replace local ${data.routed} dev ${device}`, {shell: true})
             .stderr.on('data', () => {
-            return module.exports.appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev lo' manually.`);
+            return module.exports.appendList(screen, list, `ERROR: failed to replace IPs block. Run 'ip -6 route replace local ${data.routed} dev ${device}' manually.`);
         });
         spawn(`(sudo crontab -l 2>/dev/null | grep -v '^[a-zA-Z]'; echo "@reboot sudo ip -6 route replace local ${data.routed} dev lo") | sort - | uniq - | sudo crontab -`, {shell: true})
             .stderr.on('data', () => {
@@ -164,10 +164,10 @@ WantedBy=multi-user.target
                 break;
             case 'arch' || 'manjaro':
                 await module.exports.serviceCreator(screen, setupList, data);
-                module.exports.appendList(screen, setupList, `INFO: 'he-heat' service created. Enabling IPv6 in the system...`);
-                module.exports.IPv6Enabler(screen, setupList, data, "he-ipv6");
-                module.exports. appendList(screen, setupList, `INFO: IPv6 enabled in the system, trying to start 'he-heat' service...`);
                 module.exports.appendList(screen, setupList, `INFO: service ${await module.exports.serviceManager("he-heat", "start") ? "started successfully" : "FAILED! Run 'sudo systemctl status he-ipv6' to know more."}`);
+                module.exports.appendList(screen, setupList, `INFO: enabling IPv6 in the system...`);
+                module.exports.IPv6Enabler(screen, setupList, data, "he-ipv6");
+                module.exports.appendList(screen, setupList, `INFO: IPv6 enabled in the system, trying to start 'he-heat' service...`);
                 break;
         }
     }
