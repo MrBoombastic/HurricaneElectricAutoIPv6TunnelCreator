@@ -80,11 +80,12 @@ easy to access via pseudo-GUI. It feels like GRUB, but for IPv6. Haha.
 This tool is compatible only with systems using [systemd](https://en.wikipedia.org/wiki/Systemd#Adoption) and `ip`
 command.
 
-### Working:
+### Tested and working:
 
-- Debian (tested on Buster 10)
+- Debian 10 Buster
 - Arch (tested on 19th July 2021 after `pacman -Syu`)
-- Ubuntu (tested on 20.04.1 LTS)
+- Ubuntu 20.04.1 LTS
+- CentOS 8 and Stream (Stream tested on 19th July 2021 after `yum update`)
 
 ### Should work, but not tested:
 
@@ -92,11 +93,12 @@ command.
 
 ### Candidates:
 
-- CentOS
+- Fedora 32, 33
+- Opensuse Tumbleweed, 15.1
 
 ### Does not work:
 
-- Ubuntu 18.04.5 (in theory you can replace `/usr/bin/ip` to `/bin/ip` in created service)
+- Ubuntu 18.04.5 (and older versions?) - in theory you can replace `/usr/bin/ip` to `/bin/ip` in created service
 
 ## Getting Started
 

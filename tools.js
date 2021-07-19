@@ -34,7 +34,7 @@ module.exports = {
         });
     }),
     checkCompatibilityByDistroName: async (distro = module.exports.checkDistroName) => {
-        return !!["arch", "manjaro", "debian", "ubuntu"].includes(await distro);
+        return !!["arch", "debian", "ubuntu", "centos"].includes(await distro);
     },
     printTestSummary: (screen, list, tests, failReason = "") => {
         module.exports.appendList(screen, list, "");
