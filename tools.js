@@ -86,17 +86,21 @@ module.exports = {
     },
     serviceManager: (name, activity) => {
         return new Promise((resolve, reject) => {
-            const service = spawn(`sudo systemctl ${activity} ${name}`, {shell: true});
-            service.stderr.on('data', () => {
-                return reject(false);
-            });
+            spawn(`sudo systemctl ${activity} ${name}`, {shell: true}).stderr.on('data', () => reject(false));
             return resolve(true);
         });
     },
-    serviceCreator: async (screen, list, data, ipLocation = "/usr/bin/ip") => {
+    commandLocator: (name) => {
+        return new Promise((resolve, reject) => {
+            const locator = spawn(`sudo which ${name}`, {shell: true});
+            locator.stdout.on('data', data => resolve(data.toString()));
+            locator.stderr.on('data', () => reject(false));
+        });
+    },
+    serviceCreator: async (screen, list, data) => {
+        const ipLocation = await module.exports.commandLocator("ip");
         module.exports.appendList(screen, list, `INFO: generating new service...`);
-        const service = `
-[Unit]
+        const service = `[Unit]
 Description=HurricaneElectric Tunnel (HEAT)
 After=network.target
 
@@ -126,24 +130,17 @@ WantedBy=multi-user.target
             return module.exports.appendList(screen, list, `ERROR: failed to reload systemctl daemon!`);
         });
         module.exports.appendList(screen, list, "INFO: daemon restarted! Starting service...");
-        const serviceStart = await module.exports.serviceManager("he-heat", "start").catch(e => e);
+        const serviceStart = await module.exports.serviceManager("he-heat", "start").catch(() => false);
         module.exports.appendList(screen, list, serviceStart ? "INFO: service started successfully" : "ERROR: service failed! Run 'sudo systemctl status he-ipv6' to know more.");
-        await module.exports.serviceManager("he-heat", "enable").catch(e => e);
+        await module.exports.serviceManager("he-heat", "enable").catch(() => false);
         module.exports.appendList(screen, list, "INFO: Service enabled!");
     },
     setup: async (screen, list, data) => {
-        //compatibility adjusting section
-        const distro = await module.exports.checkDistroName;
-        let ipLocation = "/usr/bin/ip";
-        if (distro === "centos") ipLocation = "/usr/sbin/ip";
-        //section end
-
         module.exports.appendList(screen, list, `INFO: setting up...`);
         if (!await module.exports.checkCompatibilityByDistroName()) module.exports.appendList(screen, list, "WARN: This distribution has not been tested! Be careful!");
-        await module.exports.serviceCreator(screen, list, data, ipLocation);
+        await module.exports.serviceCreator(screen, list, data);
         module.exports.appendList(screen, list, `INFO: enabling IPv6 in the system...`);
         module.exports.IPv6Enabler(screen, list);
         module.exports.appendList(screen, list, `INFO: IPv6 enabled in the system.`);
-
     }
 };

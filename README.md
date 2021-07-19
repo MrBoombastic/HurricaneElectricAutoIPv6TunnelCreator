@@ -180,7 +180,6 @@ Look at my GitHub profile!
 
 ## Disclaimer
 
-* This tool modifies `crontab`. Back it up first!
 * This tool modifies your network configuration. Make sure, that you have alternative ways to access your server, if
   working remotely.
 * This tool is still in beta. Some features may not work properly or at all.
