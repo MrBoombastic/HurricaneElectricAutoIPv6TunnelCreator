@@ -27,7 +27,7 @@ module.exports = {
     checkDistroName: new Promise((resolve, reject) => {
         const distroName = spawn(`grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"'`, {shell: true});
         distroName.stdout.on('data', data => {
-            resolve(data.toString().replace(/\n/g, " ").replaceAll(" ", ""));
+            resolve(data.toString().replace(/\n/g, ""));
         });
         distroName.stderr.on('data', () => {
             reject(false);
@@ -93,7 +93,7 @@ module.exports = {
     commandLocator: (name) => {
         return new Promise((resolve, reject) => {
             const locator = spawn(`sudo which ${name}`, {shell: true});
-            locator.stdout.on('data', data => resolve(data.toString()));
+            locator.stdout.on('data', data => resolve(data.toString().replace(/\n/g, "")));
             locator.stderr.on('data', () => reject(false));
         });
     },
