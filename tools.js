@@ -34,7 +34,7 @@ module.exports = {
         });
     }),
     checkCompatibilityByDistroName: async (distro = module.exports.checkDistroName) => {
-        return !!["arch", "manjaro", "debian"].includes(await distro);
+        return !!["arch", "manjaro", "debian", "ubuntu"].includes(await distro);
     },
     printTestSummary: (screen, list, tests, failReason = "") => {
         module.exports.appendList(screen, list, "");
@@ -93,7 +93,7 @@ module.exports = {
             return resolve(true);
         });
     },
-    serviceCreator: async (screen, list, data) => {
+    serviceCreator: async (screen, list, data, ipLocation = "/usr/bin/ip") => {
         module.exports.appendList(screen, list, `INFO: generating new service...`);
         const service = `
 [Unit]
@@ -103,14 +103,14 @@ After=network.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/ip tunnel add he-ipv6 mode sit remote ${data.endpoint} local ${data.local} ttl 255
-ExecStart=/usr/bin/ip link set he-ipv6 up mtu 1480
-ExecStart=/usr/bin/ip addr add ${data.address + "/64"} dev he-ipv6
-ExecStart=/usr/bin/ip -6 route add ::/0 dev he-ipv6
-ExecStart=/usr/bin/ip -6 route replace local ${data.routed} dev he-ipv6
-ExecStop=/usr/bin/ip -6 route del ::/0 dev he-ipv6
-ExecStop=/usr/bin/ip link set he-ipv6 down
-ExecStop=/usr/bin/ip tunnel del he-ipv6
+ExecStart=${ipLocation} tunnel add he-ipv6 mode sit remote ${data.endpoint} local ${data.local} ttl 255
+ExecStart=${ipLocation} link set he-ipv6 up mtu 1480
+ExecStart=${ipLocation} addr add ${data.address + "/64"} dev he-ipv6
+ExecStart=${ipLocation} -6 route add ::/0 dev he-ipv6
+ExecStart=${ipLocation} -6 route replace local ${data.routed} dev he-ipv6
+ExecStop=${ipLocation} -6 route del ::/0 dev he-ipv6
+ExecStop=${ipLocation} link set he-ipv6 down
+ExecStop=${ipLocation} tunnel del he-ipv6
 
 [Install]
 WantedBy=multi-user.target
@@ -129,21 +129,21 @@ WantedBy=multi-user.target
         const serviceStart = await module.exports.serviceManager("he-heat", "start").catch(e => e);
         module.exports.appendList(screen, list, serviceStart ? "INFO: service started successfully" : "ERROR: service failed! Run 'sudo systemctl status he-ipv6' to know more.");
         await module.exports.serviceManager("he-heat", "enable").catch(e => e);
-        module.exports.appendList(screen, list, "Service enabled!");
+        module.exports.appendList(screen, list, "INFO: Service enabled!");
     },
     setup: async (screen, list, data) => {
+        //compatibility adjusting section
+        const distro = await module.exports.checkDistroName;
+        let ipLocation = "/usr/bin/ip";
+        if (distro === "centos") ipLocation = "/usr/sbin/ip";
+        //section end
+
         module.exports.appendList(screen, list, `INFO: setting up...`);
-        switch (await module.exports.checkDistroName) {
-            case 'arch':
-            case 'manjaro':
-            case 'debian':
-                await module.exports.serviceCreator(screen, list, data);
-                module.exports.appendList(screen, list, `INFO: enabling IPv6 in the system...`);
-                module.exports.IPv6Enabler(screen, list);
-                module.exports.appendList(screen, list, `INFO: IPv6 enabled in the system.`);
-                break;
-            default:
-                return module.exports.appendList(screen, list, `ERROR: system not supported!`);
-        }
+        if (!await module.exports.checkCompatibilityByDistroName()) module.exports.appendList(screen, list, "WARN: This distribution has not been tested! Be careful!");
+        await module.exports.serviceCreator(screen, list, data, ipLocation);
+        module.exports.appendList(screen, list, `INFO: enabling IPv6 in the system...`);
+        module.exports.IPv6Enabler(screen, list);
+        module.exports.appendList(screen, list, `INFO: IPv6 enabled in the system.`);
+
     }
 };

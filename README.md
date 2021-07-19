@@ -75,19 +75,28 @@ easy to access via pseudo-GUI. It feels like GRUB, but for IPv6. Haha.
 * [Blessed](https://github.com/chjj/blessed)
 * [pkg](https://github.com/vercel/pkg)
 
-
 ## Compatibility
 
-This tool is compatible only with systems using `systemctl` and `ip` commands. That means, that Debian and Arch are
-supported distros. Manjaro should still work, but I'm not allowing Ubuntu right now.
+This tool is compatible only with systems using [systemd](https://en.wikipedia.org/wiki/Systemd#Adoption) and `ip`
+command.
 
-###Working:
-- Debian
-- Arch
-###Should work:
+### Working:
+
+- Debian (tested on Buster 10)
+- Arch (tested on 19th July 2021 after `pacman -Syu`)
+- Ubuntu (tested on 20.04.1 LTS)
+
+### Should work, but not tested:
+
 - Manjaro
-###Candidates:
-- Ubuntu
+
+### Candidates:
+
+- CentOS
+
+### Does not work:
+
+- Ubuntu 18.04.5 (in theory you can replace `/usr/bin/ip` to `/bin/ip` in created service)
 
 ## Getting Started
 
@@ -141,13 +150,10 @@ HEAT has several modes:
 
 ![Screenshot](./data/screen2.png)
 
-
 ## Roadmap
 
 See the [open issues](https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator/issues) for a list of
 proposed features (and known issues).
-
-
 
 ## Contributing
 
@@ -159,14 +165,12 @@ Any contributions make are **greatly appreciated**.
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-
 ## License
 
 Distributed under the WTFPL License. See `LICENSE.md` for more information.
 
 App's icon <a target="_blank" href="https://icons8.com/icon/pvsTkfYCFuf7/hot-springs">Hot Springs</a> created
 by <a target="_blank" href="https://icons8.com">Icons8</a>.
-
 
 ## Contact
 

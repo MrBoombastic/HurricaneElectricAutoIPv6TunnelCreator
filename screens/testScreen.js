@@ -25,7 +25,7 @@ module.exports = async (screen) => {
     screen.append(testList);
     appendList(screen, testList, `INFO: current system is ${os.release()} (${os.platform()})`);
 
-    appendList(screen, testList, `IMPORTANT_CHECK: distribution name is ${await checkDistroName}: ${await checkCompatibilityByDistroName() ? "PASSED" : "FAILED"}`);
+    appendList(screen, testList, `INFO: distribution name is ${await checkDistroName} ${await checkCompatibilityByDistroName() ? "" : "and it hasn't been tested"}`);
 
 
     //stage 1
