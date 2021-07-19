@@ -6,7 +6,7 @@ module.exports = (screen) => {
         text = box(styles.welcomeText),
         tipText = box(styles.tipText);
 
-    //setup gui
+    //setup tui
     screen.append(text);
     screen.append(tipText);
     screen.append(welcomeList);

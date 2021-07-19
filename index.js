@@ -8,7 +8,7 @@ const name = "HurricaneElectricAutoIPv6TunnelCreator",
 
 process.name = name;
 
-//Render GUI
+//Render TUI
 require("./screens/welcomeScreen")(programScreen);
 
 //Adding cancel keys

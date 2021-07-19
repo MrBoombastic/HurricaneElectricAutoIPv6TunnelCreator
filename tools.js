@@ -34,7 +34,7 @@ module.exports = {
         });
     }),
     checkCompatibilityByDistroName: async (distro = module.exports.checkDistroName) => {
-        return !!["arch", "debian", "ubuntu", "centos"].includes(await distro);
+        return !!["arch", "debian", "ubuntu", "centos", "fedora", "opensuse-leap"].includes(await distro);
     },
     printTestSummary: (screen, list, tests, failReason = "") => {
         module.exports.appendList(screen, list, "");
@@ -137,7 +137,6 @@ WantedBy=multi-user.target
     },
     setup: async (screen, list, data) => {
         module.exports.appendList(screen, list, `INFO: setting up...`);
-        if (!await module.exports.checkCompatibilityByDistroName()) module.exports.appendList(screen, list, "WARN: This distribution has not been tested! Be careful!");
         await module.exports.serviceCreator(screen, list, data);
         module.exports.appendList(screen, list, `INFO: enabling IPv6 in the system...`);
         module.exports.IPv6Enabler(screen, list);

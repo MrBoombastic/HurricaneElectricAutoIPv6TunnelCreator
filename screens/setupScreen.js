@@ -1,5 +1,13 @@
 const styles = require("../styles"),
-    {appendList, validateIP, failSetup, request4, checkElevated, setup} = require("../tools"),
+    {
+        appendList,
+        validateIP,
+        failSetup,
+        request4,
+        checkElevated,
+        setup,
+        checkCompatibilityByDistroName
+    } = require("../tools"),
     {list, prompt} = require('blessed'),
     data = {
         address: null,
@@ -20,7 +28,7 @@ module.exports = async (screen) => {
     setupList.on("select", function (data) {
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
     });
-
+    if (!await checkCompatibilityByDistroName()) appendList(screen, list, "WARN: This distribution has not been tested! Be careful!");
     //WELCOME TO CALLBACK HELL
     //BECAUSE SOMEHOW ASYNC/AWAIT DOESN'T WORK
 

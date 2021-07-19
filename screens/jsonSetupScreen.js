@@ -1,6 +1,14 @@
 const styles = require("../styles"),
     fs = require("fs"),
-    {appendList, validateIP, failSetup, request4, setup, checkElevated} = require("../tools"),
+    {
+        appendList,
+        validateIP,
+        failSetup,
+        request4,
+        setup,
+        checkElevated,
+        checkCompatibilityByDistroName
+    } = require("../tools"),
     {list} = require('blessed'),
     data = {
         address: null,
@@ -19,13 +27,13 @@ module.exports = async (screen) => {
     setupList.on("select", function (data) {
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
     });
-
+    if (!await checkCompatibilityByDistroName()) appendList(screen, list, "WARN: This distribution has not been tested! Be careful!");
     let stageText, IP;
 
     setupList.focus();
     screen.append(setupList);
 
-    if(!fs.existsSync("./answer.json")) return appendList(screen, setupList,"ERROR: no answer file detected! Copy example from GitHub and fill it.")
+    if (!fs.existsSync("./answer.json")) return appendList(screen, setupList, "ERROR: no answer file detected! Copy example from GitHub and fill it.");
 
     const answerFile = JSON.parse(fs.readFileSync("./answer.json", "UTF-8"));
 

@@ -67,7 +67,7 @@
 
 HEAT was created to help with setting up IPv6 tunnels from Hurricane Electric. Instructions found online are not always
 clear or are very outdated. This tool can help you with that doing automatically as much as possible. Every option is
-easy to access via pseudo-GUI. It feels like GRUB, but for IPv6. Haha.
+easy to access via Text User Interface. It feels like GRUB, but for IPv6. Haha.
 
 ### Built With
 
@@ -84,8 +84,9 @@ command.
 
 - Debian 10 Buster
 - Arch (tested on 19th July 2021 after `pacman -Syu`)
-- Ubuntu 20.04.1 LTS
+- Ubuntu 20.04.1 LTS and 18.04.5 LTS
 - CentOS 8 and Stream (Stream tested on 19th July 2021 after `yum update`)
+- Fedora 32 and 33
 
 ### Should work, but not tested:
 
@@ -93,12 +94,11 @@ command.
 
 ### Candidates:
 
-- Fedora 32, 33
-- Opensuse Tumbleweed, 15.1
+- No candidates right now.
 
 ### Does not work:
 
-- Ubuntu 18.04.5 (and older versions?) - in theory you can replace `/usr/bin/ip` to `/bin/ip` in created service
+- Opensuse Tumbleweed and 15.1 - missing `sit` module.
 
 ## Getting Started
 

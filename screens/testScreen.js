@@ -8,8 +8,9 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const testList = list(styles.list),
-        tests = {count: 4, passed: 4};
-    let systemctlCommandPresent = true,
+        tests = {count: 5, passed: 5};
+    let whichCommandPresent = true,
+        systemctlCommandPresent = true,
         sysctlFilePresent = true,
         ipCommandPresent = true,
         sudoCommandPresent = true;
@@ -51,12 +52,19 @@ module.exports = async (screen) => {
     appendList(screen, testList, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
 
     //stage 4
+    await commandExists("which").catch(() => {
+        whichCommandPresent = false;
+        tests.passed--;
+    });
+    appendList(screen, testList, `CHECK: checking which command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
+
+    //stage 5
     await commandExists("sudo").catch(() => {
         sudoCommandPresent = false;
         tests.passed--;
     });
     appendList(screen, testList, `CHECK: checking sudo command presence: ${sudoCommandPresent ? "PASSED" : "FAILED"}`);
+
     //summary
     printTestSummary(screen, testList, tests, "Not all tests passed, but that's OK. Read documentation.");
-
 };
