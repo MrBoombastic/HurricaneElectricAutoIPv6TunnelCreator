@@ -21,6 +21,8 @@ const styles = require("../styles"),
 module.exports = async (screen) => {
     if (!await checkElevated(screen)) return; //Checking sudo
     const setupList = list(styles.list);
+    setupList.focus();
+    screen.append(setupList);
 
     setupList.on("select", function (data) { //Listening to exit button
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
@@ -28,8 +30,6 @@ module.exports = async (screen) => {
     if (!await checkCompatibilityByDistroName()) appendList(screen, list, "WARN: This distribution has not been tested! Be careful!"); //Little warning, not important
     let stageText, IP;
 
-    setupList.focus();
-    screen.append(setupList);
 
     if (!fs.existsSync("./answer.json")) return appendList(screen, setupList, "ERROR: no answer file detected! Copy example from GitHub and fill it.");
 

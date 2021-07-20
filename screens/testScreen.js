@@ -16,6 +16,7 @@ module.exports = async (screen) => {
         sudoCommandPresent = true;
 
     testList.focus();
+    screen.append(testList);
 
     testList.on("select", function (data) { //Listening to exit button
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
@@ -31,7 +32,7 @@ module.exports = async (screen) => {
         systemctlCommandPresent = false;
         tests.passed--;
     });
-    appendList(screen, testList, `CHECK: checking ip command presence: ${systemctlCommandPresent ? "PASSED" : "FAILED"}`);
+    appendList(screen, testList, `CHECK: checking systemctl command presence: ${systemctlCommandPresent ? "PASSED" : "FAILED"}`);
 
     //STAGE 2
     try {

@@ -6,8 +6,8 @@ const styles = require("../styles"),
 
 module.exports = async (screen) => {
     const updateList = list(styles.list);
-
     updateList.focus();
+    screen.append(updateList);
 
     updateList.on("select", function (data) { //Listening to exit button
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
