@@ -11,7 +11,6 @@ const styles = require("../styles"),
     {list, prompt} = require('blessed'),
     data = {
         address: null,
-        netmask: null,
         endpoint: null,
         local: null,
         ttl: 255,
@@ -20,17 +19,21 @@ const styles = require("../styles"),
     };
 
 module.exports = async (screen) => {
-    if (!await checkElevated(screen)) return;
+    if (!await checkElevated(screen)) return; //Checking sudo
     const setupList = list(styles.list);
     setupList.focus();
     screen.append(setupList);
 
-    setupList.on("select", function (data) {
+    setupList.on("select", function (data) { //Listening to exit button
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
     });
-    if (!await checkCompatibilityByDistroName()) appendList(screen, list, "WARN: This distribution has not been tested! Be careful!");
-    //WELCOME TO CALLBACK HELL
-    //BECAUSE SOMEHOW ASYNC/AWAIT DOESN'T WORK
+    if (!await checkCompatibilityByDistroName()) appendList(screen, list, "WARN: This distribution has not been tested! Be careful!"); //Little warning, not important
+
+    /*
+    WELCOME TO CALLBACK HELL
+    BECAUSE SOMEHOW ASYNC/AWAIT DOESN'T WORK
+    AND I DON'T WANT TO FUCK WITH THAT ANY LONGER
+    */
 
     //STAGE 1
     let stageText = "Client IPv6 Address";
@@ -74,10 +77,8 @@ module.exports = async (screen) => {
                     appendList(screen, setupList, `INFO: ${stageText} is ${routed}`);
                     data.routed = routed;
 
-                    data.netmask = split[1];
-                    appendList(screen, setupList, `INFO: Detected Netmask is ${data.netmask}`);
 
-                    await setup(screen, setupList, data);
+                    await setup(screen, setupList, data); //After gathering data, start creating service
 
                     //Finish
                     appendList(screen, setupList, ``);

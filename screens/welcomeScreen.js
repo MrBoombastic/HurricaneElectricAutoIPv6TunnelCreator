@@ -25,7 +25,7 @@ module.exports = (screen) => {
             case 4:
                 return await require("./updateScreen")(screen);
             case 5:
-                return await require("./rickRollScreen")(screen);
+                return await require("./rickRollScreen")(screen); //I don't know what that screen does, really.
             case 6:
                 return process.exit(0);
             default:
@@ -34,7 +34,7 @@ module.exports = (screen) => {
     });
 
 
-    //render options
+    //Render options
     welcomeList.focus();
 
     welcomeList.addItem("0.  Test system for compatibility.");

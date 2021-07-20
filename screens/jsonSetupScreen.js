@@ -12,22 +12,20 @@ const styles = require("../styles"),
     {list} = require('blessed'),
     data = {
         address: null,
-        netmask: null,
         endpoint: null,
         local: null,
-        ttl: 255,
         gateway: null,
         routed: null
     };
 
 module.exports = async (screen) => {
-    if (!await checkElevated(screen)) return;
+    if (!await checkElevated(screen)) return; //Checking sudo
     const setupList = list(styles.list);
 
-    setupList.on("select", function (data) {
+    setupList.on("select", function (data) { //Listening to exit button
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
     });
-    if (!await checkCompatibilityByDistroName()) appendList(screen, list, "WARN: This distribution has not been tested! Be careful!");
+    if (!await checkCompatibilityByDistroName()) appendList(screen, list, "WARN: This distribution has not been tested! Be careful!"); //Little warning, not important
     let stageText, IP;
 
     setupList.focus();
@@ -35,7 +33,7 @@ module.exports = async (screen) => {
 
     if (!fs.existsSync("./answer.json")) return appendList(screen, setupList, "ERROR: no answer file detected! Copy example from GitHub and fill it.");
 
-    const answerFile = JSON.parse(fs.readFileSync("./answer.json", "UTF-8"));
+    const answerFile = JSON.parse(fs.readFileSync("./answer.json", "UTF-8")); //Not using require, because pkg would simply swallow it
 
     //STAGE 1
     stageText = "Client IPv6 Address";
@@ -78,10 +76,7 @@ module.exports = async (screen) => {
     appendList(screen, setupList, `INFO: ${stageText} is ${IP}`);
     data.routed = IP;
 
-    data.netmask = data.routed.split("/")[1];
-    appendList(screen, setupList, `INFO: Detected Netmask is ${data.netmask}`);
-
-    await setup(screen, setupList, data);
+    await setup(screen, setupList, data); //After gathering data, start creating service
 
     //Finish
     appendList(screen, setupList, ``);

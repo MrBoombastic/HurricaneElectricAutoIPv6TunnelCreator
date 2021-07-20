@@ -7,11 +7,11 @@ const got = require("got"),
     ipv6 = require("ip6addr");
 
 module.exports = {
-    appendList: (screen, list, text) => {
+    appendList: (screen, list, text) => { //Mini tool that allows one-line text appending
         list.addItem(text);
         screen.render();
     },
-    checkElevated: async (screen) => {
+    checkElevated: async (screen) => { //Checking permissions
         if (!await isElevated()) {
             const errorBox = box(styles.sudoErrorText);
             screen.append(errorBox);
@@ -21,25 +21,24 @@ module.exports = {
                 screen.render();
             }, 2000);
             return false;
-        }
-        return true;
+        } else return true;
     },
-    checkDistroName: new Promise((resolve, reject) => {
+    checkDistroName: new Promise((resolve, reject) => { //That's amazing why Node.JS hasn't got this built-in
         const distroName = spawn(`grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"'`, {shell: true});
         distroName.stdout.on('data', data => {
             resolve(data.toString().replace(/\n/g, ""));
         });
         distroName.stderr.on('data', () => {
-            reject(false);
+            resolve(false); //Not using reject, because that needs additional catch
         });
     }),
     checkCompatibilityByDistroName: async (distro = module.exports.checkDistroName) => {
-        return !!["arch", "debian", "ubuntu", "centos", "fedora", "opensuse-leap"].includes(await distro);
+        return !!["arch", "debian", "ubuntu", "centos", "fedora"].includes(await distro); //This should be up-to-date with Readme and vice-versa.
     },
     printTestSummary: (screen, list, tests, failReason = "") => {
         module.exports.appendList(screen, list, "");
         module.exports.appendList(screen, list, `INFO: All tests done. Passed ${tests.passed} of total ${tests.count} tests.`);
-        module.exports.appendList(screen, list, `INFO: ${tests.count === tests.passed ? "All test passed. You are free to go!" : `One or more tests failed. ${failReason}`}`);
+        module.exports.appendList(screen, list, tests.count === tests.passed ? "INFO: all test passed. You are free to go!" : `WARN: one or more tests failed. ${failReason}`);
 
         module.exports.appendList(screen, list, "");
         module.exports.appendList(screen, list, "1.  Exit");
@@ -47,6 +46,7 @@ module.exports = {
         //Select exit button
         list.select(Infinity);
     },
+    //Two tiny got wrappers below. Only got allows yo to choose IP to send request from in Node.
     request6: async (IP, target) => {
         return await got.get(target, {
             localAddress: IP,
@@ -74,7 +74,7 @@ module.exports = {
         //Select exit button
         list.select(Infinity);
     },
-    IPv6Enabler: (screen, list) => {
+    IPv6Enabler: (screen, list) => { //Allows to send requests from all routed IPs
         spawn('sudo sysctl -w net.ipv6.ip_nonlocal_bind=1', {shell: true})
             .stderr.on('data', () => {
             return module.exports.appendList(screen, list, `ERROR: failed to enable binding. Run "sysctl -w net.ipv6.ip_nonlocal_bind=1" manually.`);
@@ -84,21 +84,21 @@ module.exports = {
             return module.exports.appendList(screen, list, `ERROR: failed to persist binding. Add command above to '/etc/sysctl.conf' manually.`);
         });
     },
-    serviceManager: (name, activity) => {
+    serviceManager: (name, activity) => { //systemctl wrapper
         return new Promise((resolve, reject) => {
             spawn(`sudo systemctl ${activity} ${name}`, {shell: true}).stderr.on('data', () => reject(false));
-            return resolve(true);
+            return resolve(true); //Possible fixme, service may be still in starting state
         });
     },
-    commandLocator: (name) => {
+    commandLocator: (name) => { //which wrapper
         return new Promise((resolve, reject) => {
             const locator = spawn(`sudo which ${name}`, {shell: true});
             locator.stdout.on('data', data => resolve(data.toString().replace(/\n/g, "")));
             locator.stderr.on('data', () => reject(false));
         });
     },
-    serviceCreator: async (screen, list, data) => {
-        const ipLocation = await module.exports.commandLocator("ip");
+    serviceCreator: async (screen, list, data) => { //Most important function
+        const ipLocation = await module.exports.commandLocator("ip"); //Important, older Ubuntu and CentOS have different locations of ip than current Debian and Arch
         module.exports.appendList(screen, list, `INFO: generating new service...`);
         const service = `[Unit]
 Description=HurricaneElectric Tunnel (HEAT)
@@ -119,21 +119,21 @@ ExecStop=${ipLocation} tunnel del he-ipv6
 [Install]
 WantedBy=multi-user.target
 `;
-        await fs.writeFileSync("./he-heat.service", service);
+        await fs.writeFileSync("./he-heat.service", service); //Writing locally first, then copy to systemd
         module.exports.appendList(screen, list, `INFO: new service file generated`);
         module.exports.appendList(screen, list, `INFO: adding new service 'he-heat'...`);
         fs.copyFile('./he-heat.service', '/etc/systemd/system/he-heat.service', (err) => {
             if (err) return module.exports.appendList(screen, list, "ERROR: couldn't add service he-heat to systemd");
         });
-        module.exports.appendList(screen, list, "INFO: service added, restarting systemctl daemon...");
+        module.exports.appendList(screen, list, "INFO: service added, restarting systemctl daemon..."); //If service file is overwritten, we need to do this
         spawn(`sudo systemctl daemon-reload`, {shell: true}).stderr.on('data', () => {
             return module.exports.appendList(screen, list, `ERROR: failed to reload systemctl daemon!`);
         });
         module.exports.appendList(screen, list, "INFO: daemon restarted! Starting service...");
         const serviceStart = await module.exports.serviceManager("he-heat", "start").catch(() => false);
-        module.exports.appendList(screen, list, serviceStart ? "INFO: service started successfully" : "ERROR: service failed! Run 'sudo systemctl status he-ipv6' to know more.");
-        await module.exports.serviceManager("he-heat", "enable").catch(() => false);
-        module.exports.appendList(screen, list, "INFO: Service enabled!");
+        module.exports.appendList(screen, list, serviceStart ? "INFO: service started successfully" : "ERROR: service failed! Run 'sudo systemctl status he-heat' to know more.");
+        await module.exports.serviceManager("he-heat", "enable").catch(() => false); //Preserve after reboot
+        module.exports.appendList(screen, list, "INFO: service enabled!");
     },
     setup: async (screen, list, data) => {
         module.exports.appendList(screen, list, `INFO: setting up...`);

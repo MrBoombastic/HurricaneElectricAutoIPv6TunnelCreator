@@ -1,6 +1,6 @@
 {
   "name": "hurricaneelectricautoipv6tunnelcreator",
-  "version": "0.4.12",
+  "version": "1.0.0",
   "description": "HEAT is a mini tool that helps you set up a new IPv6 tunnel from HurricaneElectric.",
   "main": "index.js",
   "scripts": {

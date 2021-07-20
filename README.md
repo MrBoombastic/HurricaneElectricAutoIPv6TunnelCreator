@@ -67,7 +67,7 @@
 
 HEAT was created to help with setting up IPv6 tunnels from Hurricane Electric. Instructions found online are not always
 clear or are very outdated. This tool can help you with that doing automatically as much as possible. Every option is
-easy to access via Text User Interface. It feels like GRUB, but for IPv6. Haha.
+easy to access via Text User Interface. It feels like GRUB, but for IPv6 (insert laugh sound effect).
 
 ### Built With
 
@@ -108,14 +108,15 @@ First path - download prebuild
 
 1. Go to [releases](https://github.com/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator/releases) and download the
    latest version. Typical binary filename is `HEAT-linux-amd64`.
-   (Note: it's possibly better to copy link and download file via `wget`/`curl`, if target is a remote server.)
+
+   Note: it's possibly better to copy link and download file via `wget`/`curl`, if target is a remote server.
 2. Run `chmod +x HEAT-linux-amd64` to give permissions to execute.
 3. Run `sudo ./HEAT-linux-amd64` and choose options using keyboard. Pasting works best using the right click on a mouse
    button.
 
-Second path - from source
+Second path - build from source
 
-0. Make sure, that you have got Node v16.4.1 installed.
+0. Make sure, that you have Node v16.4.1 installed.
 1. Clone this repository using `git clone` or download and unpack ZIP file.
 2. In repo's directory run `npm install` (or `yarn`), to install dependencies.
 3. Run `npm run build`. Binary should be generated in a couple of seconds.
@@ -137,14 +138,15 @@ downloading.
 
 ## Usage
 
-Use arrows to navigate in the menu. Right-click on the mouse should paste text from the clipboard.
+Use arrows to navigate in the menu. Right-click on the mouse or `Ctrl+Shift+V` should paste text from the clipboard.
 
 HEAT has several modes:
 
-- Compatibility check - This mode checks, if system is compatible with this tool.
+- Compatibility check - This mode checks, if system is compatible with this tool. HEAT is not limited to listed distros
+  above, but requires some tools from system.
 - Tunnel setup - This mode asks about various things and then sets up IPv6 tunnel.
 - Tunnel setup using answer file - Like above, but more automatically. You can copy `answer.json` file from this repo,
-  fill it properly and put it next to binary. No questions will be asked.
+  fill it properly and put it next to the binary. No questions will be asked.
 - Connection test - Tests, if tunnel has been set up properly. If `answer.json` exists, IP to test from will be
   suggested.
 - Updates check
@@ -159,13 +161,7 @@ proposed features (and known issues).
 
 ## Contributing
 
-Any contributions make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Any contributions or bug reports will be **greatly appreciated**.
 
 ## License
 
@@ -182,7 +178,7 @@ Look at my GitHub profile!
 
 * This tool modifies your network configuration. Make sure, that you have alternative ways to access your server, if
   working remotely.
-* This tool is still in beta. Some features may not work properly or at all.
+* Some features may not work properly or at all. Even in stable releases.
 
 [contributors-shield]: https://img.shields.io/github/contributors/MrBoombastic/HurricaneElectricAutoIPv6TunnelCreator.svg?style=for-the-badge
 

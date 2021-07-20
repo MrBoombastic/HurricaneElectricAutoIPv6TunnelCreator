@@ -6,7 +6,7 @@ const name = "HurricaneElectricAutoIPv6TunnelCreator",
         title: name
     });
 
-process.name = name;
+process.name = name; //Allows easy process identification in task manager
 
 //Render TUI
 require("./screens/welcomeScreen")(programScreen);

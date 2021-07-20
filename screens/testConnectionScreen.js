@@ -10,36 +10,32 @@ module.exports = async (screen) => {
     testList.focus();
     screen.append(testList);
 
-    testList.on("select", function (data) {
+    testList.on("select", function (data) { //Listening to exit button
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
     });
 
     let defaultIP = "";
-    if (fs.existsSync("./answer.json")) {
-        const answerFile = JSON.parse(fs.readFileSync("./answer.json", "UTF-8"));
-        if (answerFile?.Routed) defaultIP = answerFile.Routed.split("/")?.[0];
+    if (fs.existsSync("./answer.json")) { //If answer file exists, we can autofill data from it
+        const answerFile = JSON.parse(fs.readFileSync("./answer.json", "UTF-8")); //Not using require, because pkg would simply swallow it
+        if (answerFile?.Routed) defaultIP = answerFile.Routed.split("/")?.[0] || "";
     }
     prompt(styles.prompt(screen)).input('What IPv6 from your assigned block do you want to test?', defaultIP, async function (err, IP) {
 
-        //stage1
+        //STAGE 1
         IP = validateIP(IP);
         testList.addItem("INFO: testing started...");
         if (IP) {
             IP = IP?.replaceAll(" ", "");
             tests.passed++;
         }
-        appendList(screen, testList, `TEST: verifying received IP - ${IP ? "PASSED" : "FAILED"}`);
+        appendList(screen, testList, `TEST: validating received IP - ${IP ? "PASSED" : "FAILED"}`);
 
-        //stage 2
-        let retrievedIP = false;
-        if (!IP) {
-            appendList(screen, testList, "INFO: No valid IP found, skipping test.");
-            return printTestSummary(screen, testList, tests);
-        }
+        //STAGE 2
+        if (!IP) return printTestSummary(screen, testList, tests);
         appendList(screen, testList, `TEST: sending request to Ipify from ${IP}`);
         const reqIpify = await request6(IP, "https://api64.ipify.org/?format=json");
         if (reqIpify.statusCode === 200) {
-            retrievedIP = JSON.parse(reqIpify.body).ip;
+            const retrievedIP = JSON.parse(reqIpify.body).ip;
             appendList(screen, testList, `RESPONSE: ${retrievedIP} - PASSED`);
             tests.passed++;
         } else {
@@ -47,8 +43,9 @@ module.exports = async (screen) => {
             return printTestSummary(screen, testList, tests);
         }
 
+        //Fun fact: if your routing is not set properly, some sites may work, and some not. That's why access to both Google and FB is tested.
 
-        //stage 3
+        //STAGE 3
         appendList(screen, testList, `TEST: sending request to Google`);
         const reqGoogle = await request6(IP, "https://google.com");
         if (reqGoogle.statusCode === 200) {
@@ -59,7 +56,7 @@ module.exports = async (screen) => {
             return printTestSummary(screen, testList, tests);
         }
 
-        //stage 4
+        //STAGE 4
         appendList(screen, testList, `TEST: sending request to Facebook`);
         const reqFB = await request6(IP, "https://facebook.com");
         if (reqGoogle.statusCode === 200) {
@@ -71,7 +68,7 @@ module.exports = async (screen) => {
         }
 
 
-        //summary
+        //Summary
         printTestSummary(screen, testList, tests);
     });
 };

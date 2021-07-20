@@ -9,7 +9,7 @@ module.exports = async (screen) => {
         width: "100%",
         height: "100%",
         type: 'overlay',
-        optimization: "mem", //it still eats up to 2GB of RAM, WTF???
+        optimization: "mem", //It still eats up to 2GB of RAM, WTF???
         file: "./data/rick.gif"
     });
     screen.append(rick)

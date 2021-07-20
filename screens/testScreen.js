@@ -17,54 +17,52 @@ module.exports = async (screen) => {
 
     testList.focus();
 
-    testList.on("select", function (data) {
+    testList.on("select", function (data) { //Listening to exit button
         if (data.content === "1.  Exit") return require("./welcomeScreen")(screen);
     });
 
-    testList.addItem("INFO: testing started...");
-    screen.append(testList);
-    appendList(screen, testList, `INFO: current system is ${os.release()} (${os.platform()})`);
-
-    appendList(screen, testList, `INFO: running distribution is ${await checkDistroName} ${await checkCompatibilityByDistroName() ? "" : "which hasn't been tested"}`);
+    appendList(screen, testList, "INFO: testing started...");
+    appendList(screen, testList, `INFO: current system is ${os.platform()} ${os.release()}`); //Outputs some garbage data, but they are for user, not for app.
+    appendList(screen, testList, await checkCompatibilityByDistroName() ? `INFO: running on ${await checkDistroName}` : `WARN: running on untested distro ${await checkDistroName}`); //Non-critical warning
 
 
-    //stage 1
+    //STAGE 1
     await commandExists("systemctl").catch(() => {
         systemctlCommandPresent = false;
         tests.passed--;
     });
     appendList(screen, testList, `CHECK: checking ip command presence: ${systemctlCommandPresent ? "PASSED" : "FAILED"}`);
 
-    //stage 2
+    //STAGE 2
     try {
         fs.accessSync("/etc/sysctl.conf");
     } catch (e) {
         sysctlFilePresent = false;
         tests.passed--;
     }
-    appendList(screen, testList, `CHECK: checking /etc/sysctl.conf file presence and access: ${sysctlFilePresent ? "PASSED" : "FAILED"}`);
+    appendList(screen, testList, `CHECK: checking sysctl.conf file presence and access: ${sysctlFilePresent ? "PASSED" : "FAILED"}`);
 
-    //stage 3
+    //STAGE 3
     await commandExists("ip").catch(() => {
         ipCommandPresent = false;
         tests.passed--;
     });
     appendList(screen, testList, `CHECK: checking ip command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
 
-    //stage 4
+    //STAGE 4
     await commandExists("which").catch(() => {
         whichCommandPresent = false;
         tests.passed--;
     });
     appendList(screen, testList, `CHECK: checking which command presence: ${ipCommandPresent ? "PASSED" : "FAILED"}`);
 
-    //stage 5
+    //STAGE 5
     await commandExists("sudo").catch(() => {
         sudoCommandPresent = false;
         tests.passed--;
     });
     appendList(screen, testList, `CHECK: checking sudo command presence: ${sudoCommandPresent ? "PASSED" : "FAILED"}`);
 
-    //summary
-    printTestSummary(screen, testList, tests, "Not all tests passed, but that's OK. Read documentation.");
+    //Summary
+    printTestSummary(screen, testList, tests, "This system is not compatible with this tool.");
 };
